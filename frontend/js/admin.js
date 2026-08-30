@@ -1024,47 +1024,280 @@ function loadReportsData() {
 }
 
 /**
- * Xuất file Excel (CSV UTF-8 BOM) tải xuống máy
+ * Xuất file Excel (.xls) định dạng màu sắc, viền ô, căn chỉnh độ rộng cột chuẩn không bị che chữ
  */
 function exportReportToExcel() {
-  const csvContent = "\uFEFF" + 
-    "BÁO CÁO DOANH THU & KINH DOANH SẢN PHẨM PHÒNG GYM FITNESS\n" +
-    "Thời gian xuất: " + new Date().toLocaleString('vi-VN') + "\n\n" +
-    "1. TỔNG QUAN DOANH THU THÁNG 8/2026\n" +
-    "Hạng mục,Doanh thu (VNĐ),Tỷ trọng (%),Tăng trưởng\n" +
-    "Doanh thu Gói tập Hội viên,34800000,72.1%,+11.5%\n" +
-    "Doanh thu Sản phẩm F&B/Whey,13450000,27.9%,+28.5%\n" +
-    "TỔNG CỘNG DOANH THU,48250000,100%,+14.2%\n\n" +
-    "2. DOANH THU KINH DOANH SẢN PHẨM CHI TIẾT (WHEY / NƯỚC / PHỤ KIỆN)\n" +
-    "Mã SP,Tên sản phẩm,Danh mục,Đơn giá (VNĐ),Số lượng bán,Tổng doanh thu (VNĐ)\n" +
-    "SP-101,Whey Gold Standard 5lbs,Supplement (Bổ sung),1800000,3 hộp,5400000\n" +
-    "SP-102,BCAA 6000 Phục hồi cơ,Supplement (Bổ sung),850000,3 hộp,2550000\n" +
-    "SP-103,Nước tăng lực Monster Energy,Beverage (Đồ uống),30000,80 lon,2400000\n" +
-    "SP-104,Áo thun tập gym Gymshark,Clothing (Trang phục),250000,8 áo,2000000\n" +
-    "SP-105,Bình nước Shaker Gym 700ml,Accessory (Phụ kiện),120000,9 bình,1100000\n\n" +
-    "3. DOANH THU THEO HUẤN LUYỆN VIÊN (HLV)\n" +
-    "Mã HLV,Họ và tên HLV,Chuyên môn,Học viên kèm,Doanh thu (VNĐ),Đánh giá\n" +
-    "HLV-01,Nguyễn Minh Tuấn,Tăng cơ giảm mỡ,12,18500000,4.9/5\n" +
-    "HLV-02,Trần Quốc Hùng,Bodybuilding,15,21200000,5.0/5\n" +
-    "HLV-03,Lê Đức Mạnh,KickFit & Boxing,8,9800000,4.7/5\n\n" +
-    "4. CƠ CẤU PHƯƠNG THỨC THANH TOÁN\n" +
-    "Phương thức,Số giao dịch,Doanh thu (VNĐ),Tỷ lệ (%)\n" +
-    "Chuyển khoản VietQR,21,28950000,60.0%\n" +
-    "Tiền mặt (Cash),11,11500000,23.8%\n" +
-    "Quẹt thẻ POS,4,4800000,10.0%\n" +
-    "Ví MoMo / VNPay,2,3000000,6.2%\n";
+  const exportTime = new Date().toLocaleString('vi-VN');
+  
+  const excelHtml = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #1F2937; }
+    table { border-collapse: collapse; width: 100%; }
+    .banner-title { background-color: #0F172A; color: #FFFFFF; font-size: 16pt; font-weight: bold; text-align: center; height: 45px; vertical-align: middle; }
+    .banner-sub { background-color: #1E293B; color: #94A3B8; font-size: 10pt; text-align: center; height: 26px; vertical-align: middle; }
+    .section-title { background-color: #FF334B; color: #FFFFFF; font-size: 12pt; font-weight: bold; height: 36px; padding-left: 12px; vertical-align: middle; }
+    .section-title-blue { background-color: #1E40AF; color: #FFFFFF; font-size: 12pt; font-weight: bold; height: 36px; padding-left: 12px; vertical-align: middle; }
+    .th-cell { background-color: #334155; color: #FFFFFF; font-weight: bold; text-align: center; height: 32px; border: 1px solid #64748B; vertical-align: middle; }
+    .td-cell { border: 1px solid #CBD5E1; padding: 8px 12px; height: 28px; vertical-align: middle; }
+    .td-num { border: 1px solid #CBD5E1; padding: 8px 12px; text-align: right; vertical-align: middle; }
+    .td-center { border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; }
+    .row-even { background-color: #F8FAFC; }
+    .row-total { background-color: #FEF2F2; font-weight: bold; color: #DC2626; height: 32px; border: 2px solid #FF334B; }
+    .badge-green { color: #059669; font-weight: bold; }
+    .badge-blue { color: #2563EB; font-weight: bold; }
+    .badge-yellow { color: #D97706; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <table>
+    <colgroup>
+      <col style="width: 100px;">
+      <col style="width: 280px;">
+      <col style="width: 220px;">
+      <col style="width: 160px;">
+      <col style="width: 140px;">
+      <col style="width: 180px;">
+      <col style="width: 140px;">
+    </colgroup>
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    <!-- Header Banner -->
+    <tr>
+      <td colspan="7" class="banner-title">HỆ THỐNG PHÒNG TẬP GYM FITNESS - BÁO CÁO DOANH THU TỔNG HỢP</td>
+    </tr>
+    <tr>
+      <td colspan="7" class="banner-sub">Thời gian xuất báo cáo: ${exportTime} • Kỳ thống kê: Tháng 08/2026</td>
+    </tr>
+    <tr><td colspan="7" style="height: 14px;"></td></tr>
+
+    <!-- PHẦN 1: TỔNG QUAN DOANH THU -->
+    <tr>
+      <td colspan="7" class="section-title">1. TỔNG QUAN DOANH THU THÁNG 08/2026</td>
+    </tr>
+    <tr>
+      <th class="th-cell">Mã HM</th>
+      <th class="th-cell" colspan="2">Hạng mục Doanh thu</th>
+      <th class="th-cell">Doanh thu (VNĐ)</th>
+      <th class="th-cell">Tỷ trọng (%)</th>
+      <th class="th-cell">Tăng trưởng</th>
+      <th class="th-cell">Trạng thái</th>
+    </tr>
+    <tr>
+      <td class="td-center">HM-01</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold;">Doanh thu Gói tập Hội viên (Membership)</td>
+      <td class="td-num" style="color: #FF334B; font-weight: bold;">34.800.000 VNĐ</td>
+      <td class="td-center">72.1%</td>
+      <td class="td-center badge-green">+11.5%</td>
+      <td class="td-center badge-green">Đạt chỉ tiêu</td>
+    </tr>
+    <tr class="row-even">
+      <td class="td-center">HM-02</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold; color: #2563EB;">Doanh thu Bán lẻ Sản phẩm (Whey / Nước / Phụ kiện)</td>
+      <td class="td-num" style="color: #2563EB; font-weight: bold;">13.450.000 VNĐ</td>
+      <td class="td-center">27.9%</td>
+      <td class="td-center badge-green">+28.5%</td>
+      <td class="td-center badge-green">Tăng trưởng mạnh</td>
+    </tr>
+    <tr class="row-total">
+      <td class="td-center" style="font-weight: bold;">TỔNG CỘNG</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold;">TỔNG DOANH THU PHÒNG GYM THÁNG 8</td>
+      <td class="td-num" style="font-size: 12pt; color: #DC2626; font-weight: bold;">48.250.000 VNĐ</td>
+      <td class="td-center" style="font-weight: bold;">100.0%</td>
+      <td class="td-center badge-green" style="font-weight: bold;">+14.2%</td>
+      <td class="td-center badge-green" style="font-weight: bold;">Vượt KPI</td>
+    </tr>
+
+    <tr><td colspan="7" style="height: 18px;"></td></tr>
+
+    <!-- PHẦN 2: DOANH THU KINH DOANH SẢN PHẨM -->
+    <tr>
+      <td colspan="7" class="section-title-blue">2. DOANH THU KINH DOANH SẢN PHẨM CHI TIẾT (WHEY, NƯỚC UỐNG, TRANG PHỤC, PHỤ KIỆN)</td>
+    </tr>
+    <tr>
+      <th class="th-cell">Mã SP</th>
+      <th class="th-cell">Tên sản phẩm</th>
+      <th class="th-cell">Danh mục</th>
+      <th class="th-cell">Đơn giá bán</th>
+      <th class="th-cell">Số lượng bán</th>
+      <th class="th-cell">Tổng doanh thu</th>
+      <th class="th-cell">Tỷ trọng SP</th>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight: bold; color: #FF334B;">SP-101</td>
+      <td class="td-cell" style="font-weight: bold;">Whey Gold Standard 5lbs</td>
+      <td class="td-cell">Thực phẩm bổ sung (Supplement)</td>
+      <td class="td-num">1.800.000 VNĐ</td>
+      <td class="td-center" style="font-weight: bold;">3 Hộp</td>
+      <td class="td-num" style="color: #FF334B; font-weight: bold;">5.400.000 VNĐ</td>
+      <td class="td-center">40.1%</td>
+    </tr>
+    <tr class="row-even">
+      <td class="td-center" style="font-weight: bold; color: #FF334B;">SP-102</td>
+      <td class="td-cell" style="font-weight: bold;">BCAA 6000 Phục hồi cơ</td>
+      <td class="td-cell">Thực phẩm bổ sung (Supplement)</td>
+      <td class="td-num">850.000 VNĐ</td>
+      <td class="td-center" style="font-weight: bold;">3 Hộp</td>
+      <td class="td-num" style="color: #FF334B; font-weight: bold;">2.550.000 VNĐ</td>
+      <td class="td-center">19.0%</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight: bold; color: #2563EB;">SP-103</td>
+      <td class="td-cell" style="font-weight: bold;">Nước tăng lực Monster Energy</td>
+      <td class="td-cell">Đồ uống &amp; Năng lượng (Beverage)</td>
+      <td class="td-num">30.000 VNĐ</td>
+      <td class="td-center" style="font-weight: bold;">80 Lon</td>
+      <td class="td-num" style="color: #2563EB; font-weight: bold;">2.400.000 VNĐ</td>
+      <td class="td-center">17.8%</td>
+    </tr>
+    <tr class="row-even">
+      <td class="td-center" style="font-weight: bold; color: #059669;">SP-104</td>
+      <td class="td-cell" style="font-weight: bold;">Áo thun tập gym Gymshark</td>
+      <td class="td-cell">Trang phục thể thao (Clothing)</td>
+      <td class="td-num">250.000 VNĐ</td>
+      <td class="td-center" style="font-weight: bold;">8 Áo</td>
+      <td class="td-num" style="color: #059669; font-weight: bold;">2.000.000 VNĐ</td>
+      <td class="td-center">14.9%</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight: bold; color: #D97706;">SP-105</td>
+      <td class="td-cell" style="font-weight: bold;">Bình nước Shaker Gym 700ml</td>
+      <td class="td-cell">Phụ kiện tập luyện (Accessory)</td>
+      <td class="td-num">120.000 VNĐ</td>
+      <td class="td-center" style="font-weight: bold;">9 Bình</td>
+      <td class="td-num" style="color: #D97706; font-weight: bold;">1.100.000 VNĐ</td>
+      <td class="td-center">8.2%</td>
+    </tr>
+    <tr class="row-total" style="background-color: #EFF6FF; border: 2px solid #2563EB;">
+      <td class="td-center" style="font-weight: bold; color: #2563EB;">TỔNG SẢN PHẨM</td>
+      <td class="td-cell" colspan="3" style="font-weight: bold; color: #2563EB;">TỔNG DOANH THU KINH DOANH SẢN PHẨM (F&B / WHEY)</td>
+      <td class="td-center" style="font-weight: bold; color: #2563EB;">103 Đơn vị</td>
+      <td class="td-num" style="font-size: 11.5pt; color: #2563EB; font-weight: bold;">13.450.000 VNĐ</td>
+      <td class="td-center" style="font-weight: bold; color: #2563EB;">100.0%</td>
+    </tr>
+
+    <tr><td colspan="7" style="height: 18px;"></td></tr>
+
+    <!-- PHẦN 3: HIỆU SUẤT HUẤN LUYỆN VIÊN -->
+    <tr>
+      <td colspan="7" class="section-title">3. HIỆU SUẤT DOANH THU THEO HUẤN LUYỆN VIÊN (HLV)</td>
+    </tr>
+    <tr>
+      <th class="th-cell">Mã HLV</th>
+      <th class="th-cell" colspan="2">Họ và tên HLV</th>
+      <th class="th-cell">Chuyên môn</th>
+      <th class="th-cell">Số học viên</th>
+      <th class="th-cell">Doanh thu phụ trách</th>
+      <th class="th-cell">Đánh giá sao</th>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight: bold;">HLV-01</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold;">Nguyễn Minh Tuấn</td>
+      <td class="td-cell">Tăng cơ giảm mỡ &amp; PT Cá nhân</td>
+      <td class="td-center" style="font-weight: bold;">12 Học viên</td>
+      <td class="td-num" style="color: #059669; font-weight: bold;">18.500.000 VNĐ</td>
+      <td class="td-center badge-yellow">⭐⭐⭐⭐⭐ 4.9/5</td>
+    </tr>
+    <tr class="row-even">
+      <td class="td-center" style="font-weight: bold;">HLV-02</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold;">Trần Quốc Hùng</td>
+      <td class="td-cell">Bodybuilding &amp; Sức mạnh</td>
+      <td class="td-center" style="font-weight: bold;">15 Học viên</td>
+      <td class="td-num" style="color: #059669; font-weight: bold;">21.200.000 VNĐ</td>
+      <td class="td-center badge-yellow">⭐⭐⭐⭐⭐ 5.0/5</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight: bold;">HLV-03</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold;">Lê Đức Mạnh</td>
+      <td class="td-cell">KickFit, Boxing &amp; Cardio</td>
+      <td class="td-center" style="font-weight: bold;">8 Học viên</td>
+      <td class="td-num" style="color: #059669; font-weight: bold;">9.800.000 VNĐ</td>
+      <td class="td-center badge-yellow">⭐⭐⭐⭐☆ 4.7/5</td>
+    </tr>
+
+    <tr><td colspan="7" style="height: 18px;"></td></tr>
+
+    <!-- PHẦN 4: CƠ CẤU PHƯƠNG THỨC THANH TOÁN -->
+    <tr>
+      <td colspan="7" class="section-title-blue">4. CƠ CẤU PHƯƠNG THỨC THANH TOÁN (PAYMENT METHODS)</td>
+    </tr>
+    <tr>
+      <th class="th-cell">STT</th>
+      <th class="th-cell" colspan="2">Phương thức thanh toán</th>
+      <th class="th-cell">Số giao dịch</th>
+      <th class="th-cell">Doanh thu thu về</th>
+      <th class="th-cell">Tỷ trọng</th>
+      <th class="th-cell">Ghi chú</th>
+    </tr>
+    <tr>
+      <td class="td-center">1</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold; color: #DC2626;">Chuyển khoản VietQR (Ngân hàng MB Bank)</td>
+      <td class="td-center" style="font-weight: bold;">21 Giao dịch</td>
+      <td class="td-num" style="color: #059669; font-weight: bold;">28.950.000 VNĐ</td>
+      <td class="td-center">60.0%</td>
+      <td class="td-center">Chuyển khoản tự động</td>
+    </tr>
+    <tr class="row-even">
+      <td class="td-center">2</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold; color: #059669;">Tiền mặt (Cash tại quầy tiếp tân)</td>
+      <td class="td-center" style="font-weight: bold;">11 Giao dịch</td>
+      <td class="td-num" style="color: #059669; font-weight: bold;">11.500.000 VNĐ</td>
+      <td class="td-center">23.8%</td>
+      <td class="td-center">Thu trực tiếp</td>
+    </tr>
+    <tr>
+      <td class="td-center">3</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold; color: #2563EB;">Quẹt thẻ POS (Visa / MasterCard / ATM)</td>
+      <td class="td-center" style="font-weight: bold;">4 Giao dịch</td>
+      <td class="td-num" style="color: #059669; font-weight: bold;">4.800.000 VNĐ</td>
+      <td class="td-center">10.0%</td>
+      <td class="td-center">Máy POS chi nhánh</td>
+    </tr>
+    <tr class="row-even">
+      <td class="td-center">4</td>
+      <td class="td-cell" colspan="2" style="font-weight: bold; color: #D97706;">Ví điện tử (MoMo / VNPay / ZaloPay)</td>
+      <td class="td-center" style="font-weight: bold;">2 Giao dịch</td>
+      <td class="td-num" style="color: #059669; font-weight: bold;">3.000.000 VNĐ</td>
+      <td class="td-center">6.2%</td>
+      <td class="td-center">Ví điện tử</td>
+    </tr>
+
+    <tr><td colspan="7" style="height: 35px;"></td></tr>
+
+    <!-- Chữ ký xác nhận -->
+    <tr>
+      <td colspan="2" style="text-align: center; font-weight: bold; color: #1E293B;">NGƯỜI LẬP BÁO CÁO<br><span style="font-size: 9.5pt; font-weight: normal; color: #64748B;">(Ký và ghi rõ họ tên)</span></td>
+      <td colspan="3" style="text-align: center; font-weight: bold; color: #1E293B;">KẾ TOÁN TRƯỞNG<br><span style="font-size: 9.5pt; font-weight: normal; color: #64748B;">(Ký và ghi rõ họ tên)</span></td>
+      <td colspan="2" style="text-align: center; font-weight: bold; color: #1E293B;">GIÁM ĐỐC PHÒNG GYM<br><span style="font-size: 9.5pt; font-weight: normal; color: #64748B;">(Ký, đóng dấu)</span></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="height: 60px;"></td>
+      <td colspan="3" style="height: 60px;"></td>
+      <td colspan="2" style="height: 60px;"></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: center; font-weight: bold;">Văn Điền</td>
+      <td colspan="3" style="text-align: center; font-weight: bold;">Nguyễn Văn Quản Lý</td>
+      <td colspan="2" style="text-align: center; font-weight: bold;">Ban Giám Đốc Fitness</td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+
+  const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.setAttribute('href', url);
-  link.setAttribute('download', 'Bao_Cao_Doanh_Thu_Gym_Fitness_2026.csv');
+  link.setAttribute('download', 'Bao_Cao_Doanh_Thu_Gym_Fitness_2026.xls');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 
-  showToast('🎉 Đã tải xuống file Báo cáo Doanh thu & Bán hàng Excel thành công!', 'success');
+  showToast('🎉 Đã xuất file Báo cáo Excel (.xls) chuyên nghiệp có màu & độ rộng cột chuẩn thành công!', 'success');
 }
+
 
 window.switchAdminTab = switchAdminTab;
 window.openAddPackageModal = openAddPackageModal;
