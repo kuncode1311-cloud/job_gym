@@ -376,7 +376,9 @@ button, input, select, textarea {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+  margin-bottom: 24px;
 }
+
 
 .stat-card {
   background: rgba(26, 20, 32, 0.65);
