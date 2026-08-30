@@ -992,6 +992,80 @@ function loadMySalary() {
   }
 }
 
+/**
+ * Tải và lọc dữ liệu Báo cáo thống kê
+ */
+function loadReportsData() {
+  const range = document.getElementById('reportTimeRange')?.value || 'month';
+  const totalRevEl = document.getElementById('repTotalRevenue');
+  const prodRevEl = document.getElementById('repProductRevenue');
+  const newMemEl = document.getElementById('repNewMembers');
+  const renewalEl = document.getElementById('repRenewalRate');
+
+  if (range === 'q3') {
+    if (totalRevEl) totalRevEl.textContent = '129.650.000đ';
+    if (prodRevEl) prodRevEl.textContent = '37.800.000đ';
+    if (newMemEl) newMemEl.textContent = '52 Hội viên';
+    if (renewalEl) renewalEl.textContent = '78.2%';
+    showToast('Đã cập nhật số liệu báo cáo theo Quý 3/2026', 'info');
+  } else if (range === 'year') {
+    if (totalRevEl) totalRevEl.textContent = '385.200.000đ';
+    if (prodRevEl) prodRevEl.textContent = '112.500.000đ';
+    if (newMemEl) newMemEl.textContent = '168 Hội viên';
+    if (renewalEl) renewalEl.textContent = '75.8%';
+    showToast('Đã cập nhật số liệu báo cáo cả năm 2026', 'info');
+  } else {
+    if (totalRevEl) totalRevEl.textContent = '48.250.000đ';
+    if (prodRevEl) prodRevEl.textContent = '13.450.000đ';
+    if (newMemEl) newMemEl.textContent = '18 Hội viên';
+    if (renewalEl) renewalEl.textContent = '76.5%';
+    showToast('Đã cập nhật số liệu báo cáo Tháng 8/2026', 'info');
+  }
+}
+
+/**
+ * Xuất file Excel (CSV UTF-8 BOM) tải xuống máy
+ */
+function exportReportToExcel() {
+  const csvContent = "\uFEFF" + 
+    "BÁO CÁO DOANH THU & KINH DOANH SẢN PHẨM PHÒNG GYM FITNESS\n" +
+    "Thời gian xuất: " + new Date().toLocaleString('vi-VN') + "\n\n" +
+    "1. TỔNG QUAN DOANH THU THÁNG 8/2026\n" +
+    "Hạng mục,Doanh thu (VNĐ),Tỷ trọng (%),Tăng trưởng\n" +
+    "Doanh thu Gói tập Hội viên,34800000,72.1%,+11.5%\n" +
+    "Doanh thu Sản phẩm F&B/Whey,13450000,27.9%,+28.5%\n" +
+    "TỔNG CỘNG DOANH THU,48250000,100%,+14.2%\n\n" +
+    "2. DOANH THU KINH DOANH SẢN PHẨM CHI TIẾT (WHEY / NƯỚC / PHỤ KIỆN)\n" +
+    "Mã SP,Tên sản phẩm,Danh mục,Đơn giá (VNĐ),Số lượng bán,Tổng doanh thu (VNĐ)\n" +
+    "SP-101,Whey Gold Standard 5lbs,Supplement (Bổ sung),1800000,3 hộp,5400000\n" +
+    "SP-102,BCAA 6000 Phục hồi cơ,Supplement (Bổ sung),850000,3 hộp,2550000\n" +
+    "SP-103,Nước tăng lực Monster Energy,Beverage (Đồ uống),30000,80 lon,2400000\n" +
+    "SP-104,Áo thun tập gym Gymshark,Clothing (Trang phục),250000,8 áo,2000000\n" +
+    "SP-105,Bình nước Shaker Gym 700ml,Accessory (Phụ kiện),120000,9 bình,1100000\n\n" +
+    "3. DOANH THU THEO HUẤN LUYỆN VIÊN (HLV)\n" +
+    "Mã HLV,Họ và tên HLV,Chuyên môn,Học viên kèm,Doanh thu (VNĐ),Đánh giá\n" +
+    "HLV-01,Nguyễn Minh Tuấn,Tăng cơ giảm mỡ,12,18500000,4.9/5\n" +
+    "HLV-02,Trần Quốc Hùng,Bodybuilding,15,21200000,5.0/5\n" +
+    "HLV-03,Lê Đức Mạnh,KickFit & Boxing,8,9800000,4.7/5\n\n" +
+    "4. CƠ CẤU PHƯƠNG THỨC THANH TOÁN\n" +
+    "Phương thức,Số giao dịch,Doanh thu (VNĐ),Tỷ lệ (%)\n" +
+    "Chuyển khoản VietQR,21,28950000,60.0%\n" +
+    "Tiền mặt (Cash),11,11500000,23.8%\n" +
+    "Quẹt thẻ POS,4,4800000,10.0%\n" +
+    "Ví MoMo / VNPay,2,3000000,6.2%\n";
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'Bao_Cao_Doanh_Thu_Gym_Fitness_2026.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast('🎉 Đã tải xuống file Báo cáo Doanh thu & Bán hàng Excel thành công!', 'success');
+}
+
 window.switchAdminTab = switchAdminTab;
 window.openAddPackageModal = openAddPackageModal;
 window.openEditPackageModal = openEditPackageModal;
@@ -1009,4 +1083,7 @@ window.openEditUserModal = openEditUserModal;
 window.handleSaveUser = handleSaveUser;
 window.toggleUserStatus = toggleUserStatus;
 window.loadMySalary = loadMySalary;
+window.loadReportsData = loadReportsData;
+window.exportReportToExcel = exportReportToExcel;
+
 
