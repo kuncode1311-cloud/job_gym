@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Gym Management System</title>
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Reusable Top Header Component -->
+    <header class="app-header" id="appHeader"></header>
+    <div class="header-separator-line"></div>
+
+
+    <!-- Main Layout Content -->
+    <div class="main-wrapper">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar" id="sidebarNav">
+        <!-- Populated dynamically by common.js -->
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="content-area">
+        <!-- STAFF DASHBOARD: THÔNG TIN CÁ NHÂN (CHUẨN FIGMA) -->
+        <div id="staffProfileView" style="display: none;">
+          <!-- Header Bar -->
+          <div class="card-header-flex" style="margin-bottom: 24px;">
+            <div>
+              <h2 style="font-size: 24px; font-weight: 800; color: #FFFFFF; margin: 0;">Thông tin cá nhân</h2>
+              <p style="font-size: 13.5px; color: #9CA3AF; margin: 4px 0 0 0;">Quản lý hồ sơ, lịch làm việc và thông tin nhân viên</p>
+            </div>
+          </div>
+
+          <!-- Split Grid: Left Profile Form ~60% - Right Schedule Stack ~40% -->
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; align-items: start;">
+            <!-- Left Profile Card -->
+            <div class="glass-card" style="padding: 28px;">
+              <!-- User Header -->
+              <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                <div style="width: 60px; height: 60px; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                  <img src="../assets/images/logo.png" alt="Gym Avatar" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div>
+                  <h3 id="staffFullNameHeader" style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin: 0;">Lâm Văn Cường</h3>
+                </div>
+              </div>
+
+
+              <!-- Form Fields -->
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                  <label style="font-size: 12px; color: #9CA3AF; font-weight: 600; margin-bottom: 6px; display: block;">Username</label>
+                  <input type="text" id="staffUsername" class="form-control" value="vancuong_staff" readonly style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #FFFFFF; border-radius: 8px; padding: 10px 14px;">
+                </div>
+
+                <div>
+                  <label style="font-size: 12px; color: #9CA3AF; font-weight: 600; margin-bottom: 6px; display: block;">Role</label>
+                  <input type="text" id="staffRole" class="form-control" value="Nhân viên hỗ trợ" readonly style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #FFFFFF; border-radius: 8px; padding: 10px 14px;">
+                </div>
+
+                <div>
+                  <label style="font-size: 12px; color: #9CA3AF; font-weight: 600; margin-bottom: 6px; display: block;">Status</label>
+                  <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #10B981; border-radius: 8px; padding: 10px 14px; font-weight: 700;">Active</div>
+                </div>
+
+                <div>
+                  <label style="font-size: 12px; color: #9CA3AF; font-weight: 600; margin-bottom: 6px; display: block;">Email</label>
+                  <input type="text" id="staffEmail" class="form-control" value="vancuong@gmail.com" readonly style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #FFFFFF; border-radius: 8px; padding: 10px 14px;">
+                </div>
+
+                <div>
+                  <label style="font-size: 12px; color: #9CA3AF; font-weight: 600; margin-bottom: 6px; display: block;">Phone</label>
+                  <input type="text" id="staffPhone" class="form-control" value="0901111222" readonly style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #FFFFFF; border-radius: 8px; padding: 10px 14px;">
+                </div>
+
+                <div>
+                  <label style="font-size: 12px; color: #9CA3AF; font-weight: 600; margin-bottom: 6px; display: block;">Ngày vào làm</label>
+                  <input type="text" id="staffJoinDate" class="form-control" value="2025-06-15" readonly style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #FFFFFF; border-radius: 8px; padding: 10px 14px;">
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 12px; margin-top: 8px;">
+                  <button class="btn btn-primary" style="flex: 1; padding: 12px; font-weight: 700;" onclick="showToast('Đã lưu cập nhật thông tin cá nhân!', 'success')">
+                    Cập nhật thông tin
+                  </button>
+                  <button class="btn btn-secondary" style="flex: 1; padding: 12px; font-weight: 600;" onclick="showToast('Mở cửa sổ đổi mật khẩu')">
+                    Đổi mật khẩu
+                  </button>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Right Stack -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <!-- Card 1: Lịch làm việc -->
+              <div class="glass-card" style="padding: 24px;">
+                <h3 style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin: 0 0 16px 0;">Lịch làm việc</h3>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+                  <span style="color: #FFFFFF; font-weight: 600; font-size: 14px;">Thứ 2 - Thứ 7 (08:00 - 18:00)</span>
+                  <span style="color: #10B981; font-size: 12.5px; font-weight: 600;">Đang nhận nhiệm vụ</span>
+                </div>
+              </div>
+
+              <!-- Card 2: Lịch sử công việc -->
+              <div class="glass-card" style="padding: 24px;">
+                <h3 style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin: 0 0 16px 0;">Lịch sử công việc</h3>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(255,51,75,0.15); display: flex; align-items: center; justify-content: center; color: #FF334B; font-size: 16px;">
+                    <i class="fa fa-briefcase"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight: 700; color: #FFFFFF; font-size: 14px;">Nhân viên hỗ trợ chính thức</div>
+                    <div style="font-size: 12.5px; color: #9CA3AF; margin-top: 2px;">Đơn vị: Gym Center</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRAINER DASHBOARD: LỊCH DẠY HÔM NAY (CHUẨN FIGMA) -->
+        <div id="trainerDashboardView" style="display: none;">
+          <!-- Header -->
+          <div class="dashboard-greeting" style="margin-bottom: 24px;">
+            <div>
+              <h2 id="trainerGreetingTitle" style="font-size: 24px; font-weight: 800; color: #FFFFFF; margin: 0;">Chào Trần Quốc Bảo! 🏋️</h2>
+              <p style="font-size: 13.5px; color: #9CA3AF; margin: 4px 0 0 0;">Quản lý lịch dạy và theo dõi tiến độ học viên hôm nay</p>
+            </div>
+          </div>
+
+          <!-- 4 Top Stat Cards (All White Values) -->
+          <div class="stats-grid" style="margin-bottom: 24px;">
+            <div class="stat-card">
+              <span class="stat-label">Buổi dạy hôm nay</span>
+              <span class="stat-value text-white">4 buổi</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Tổng học viên</span>
+              <span class="stat-value text-white">12 học viên</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Đánh giá TB</span>
+              <span class="stat-value text-white">4.9/5</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Thu nhập tháng</span>
+              <span class="stat-value text-white">8.500.000đ</span>
+            </div>
+          </div>
+
+          <!-- Main Card: Lịch dạy hôm nay -->
+          <div class="glass-card" style="padding: 24px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #FFFFFF; margin: 0 0 20px 0;">Lịch dạy hôm nay</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Row 1 -->
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 16px; font-weight: 700; color: #FFFFFF;">08:00 - 09:00</span>
+                  <span style="font-size: 13.5px; color: #9CA3AF;">Nguyễn Minh Khoa</span>
+                </div>
+                <div style="color: #6B7280; font-size: 13.5px;">Gym & Fitness</div>
+                <div>
+                  <span class="badge badge-green" style="padding: 6px 16px; border-radius: 12px; font-weight: 600; font-size: 12.5px;">Đã check-in</span>
+                </div>
+              </div>
+
+              <!-- Row 2 -->
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 16px; font-weight: 700; color: #FFFFFF;">10:00 - 11:00</span>
+                  <span style="font-size: 13.5px; color: #9CA3AF;">Trần Thị Lan</span>
+                </div>
+                <div style="color: #6B7280; font-size: 13.5px;">Gym & Fitness</div>
+                <div>
+                  <span class="badge badge-red" style="padding: 6px 16px; border-radius: 12px; font-weight: 600; font-size: 12.5px;">Chờ tập</span>
+                </div>
+              </div>
+
+              <!-- Row 3 -->
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 16px; font-weight: 700; color: #FFFFFF;">14:00 - 15:00</span>
+                  <span style="font-size: 13.5px; color: #9CA3AF;">Phạm Ngọc Anh</span>
+                </div>
+                <div style="color: #6B7280; font-size: 13.5px;">Gym & Fitness</div>
+                <div>
+                  <span class="badge badge-red" style="padding: 6px 16px; border-radius: 12px; font-weight: 600; font-size: 12.5px;">Chờ tập</span>
+                </div>
+              </div>
+
+              <!-- Row 4 -->
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 16px; font-weight: 700; color: #FFFFFF;">17:00 - 18:00</span>
+                  <span style="font-size: 13.5px; color: #9CA3AF;">Lê Văn Hùng</span>
+                </div>
+                <div style="color: #6B7280; font-size: 13.5px;">Gym & Fitness</div>
+                <div>
+                  <span class="badge badge-red" style="padding: 6px 16px; border-radius: 12px; font-weight: 600; font-size: 12.5px;">Chờ tập</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 4: MEMBER DASHBOARD (CHUẨN FIGMA) -->
+        <div id="memberDashboardView" style="display: none;">
+          <!-- Welcome Header -->
+          <div class="card-header-flex" style="margin-bottom: 24px; align-items: center;">
+            <div>
+              <h1 style="font-size: 26px; font-weight: 800; color: #FFFFFF; margin: 0 0 6px 0;">
+                Chào <span id="memberWelcomeName">Nguyễn Văn An</span>! 🏋️
+              </h1>
+              <p style="font-size: 14px; color: #9CA3AF; margin: 0;">
+                Chào mừng bạn quay trở lại luyện tập hôm nay
+              </p>
+            </div>
+            <button class="btn btn-primary" style="padding: 10px 20px; font-weight: 700;" onclick="window.location.href='trainer.html#book_pt'">
+              <i class="fa fa-calendar-plus"></i> Đặt lịch PT
+            </button>
+          </div>
+
+          <!-- Top 4 Member KPI Cards -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px;">
+            <!-- KPI 1 -->
+            <div class="glass-card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-size: 12px; color: #9CA3AF; font-weight: 600; text-transform: uppercase;">GÓI TẬP HIỆN TẠI</div>
+              <div style="font-size: 18px; font-weight: 800; color: #FFFFFF;">Gói 1 Tháng</div>
+              <div style="font-size: 12px; color: #10B981; font-weight: 700;">● Đang hoạt động</div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="glass-card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-size: 12px; color: #9CA3AF; font-weight: 600; text-transform: uppercase;">THỜI HẠN CÒN LẠI</div>
+              <div style="font-size: 22px; font-weight: 800; color: #FF334B;">15 Ngày</div>
+              <div style="font-size: 12px; color: #9CA3AF;">Hết hạn: 10/02/2026</div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="glass-card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-size: 12px; color: #9CA3AF; font-weight: 600; text-transform: uppercase;">BUỔI TẬP THÁNG NÀY</div>
+              <div style="font-size: 22px; font-weight: 800; color: #10B981;">12 Buổi</div>
+              <div style="font-size: 12px; color: #9CA3AF;">Đạt 80% mục tiêu</div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="glass-card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-size: 12px; color: #9CA3AF; font-weight: 600; text-transform: uppercase;">HLV CÁ NHÂN (PT)</div>
+              <div style="font-size: 18px; font-weight: 800; color: #FFFFFF;">Nguyễn Minh Tuấn</div>
+              <div style="font-size: 12px; color: #3B82F6;">PT 1:1 Thể hình</div>
+            </div>
+          </div>
+
+          <!-- 2 Column Split Grid -->
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
+            <!-- Left: Lịch tập sắp tới với PT -->
+            <div class="glass-card" style="padding: 24px;">
+              <div class="card-header-flex" style="margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #FFFFFF; margin: 0;">Lịch tập sắp tới với PT</h3>
+                <a href="trainer.html#book_pt" style="color: #FF334B; font-size: 13px; font-weight: 600; text-decoration: none;">Xem tất cả →</a>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #FF334B;"></div>
+                    <div>
+                      <div style="font-weight: 700; color: #FFFFFF; font-size: 14.5px;">Thứ 3 • 08:00 - 09:00</div>
+                      <div style="font-size: 12.5px; color: #9CA3AF; margin-top: 2px;">Luyện tập ngực &amp; tay trước • HLV Nguyễn Minh Tuấn</div>
+                    </div>
+                  </div>
+                  <span class="badge badge-green" style="padding: 4px 12px; border-radius: 8px;">Đã duyệt</span>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #FF334B;"></div>
+                    <div>
+                      <div style="font-weight: 700; color: #FFFFFF; font-size: 14.5px;">Thứ 5 • 17:00 - 18:00</div>
+                      <div style="font-size: 12.5px; color: #9CA3AF; margin-top: 2px;">Compound Squat &amp; Lưng xô • HLV Nguyễn Minh Tuấn</div>
+                    </div>
+                  </div>
+                  <span class="badge badge-green" style="padding: 4px 12px; border-radius: 8px;">Đã duyệt</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Chỉ số InBody gần nhất -->
+            <div class="glass-card" style="padding: 24px;">
+              <div class="card-header-flex" style="margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #FFFFFF; margin: 0;">Chỉ số InBody gần nhất</h3>
+                <a href="member.html#progress" style="color: #FF334B; font-size: 13px; font-weight: 600; text-decoration: none;">Chi tiết →</a>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px; text-align: center;">
+                  <div style="font-size: 12px; color: #9CA3AF;">Cân nặng</div>
+                  <div style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-top: 4px;">68.5 kg</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px; text-align: center;">
+                  <div style="font-size: 12px; color: #9CA3AF;">Chiều cao</div>
+                  <div style="font-size: 20px; font-weight: 800; color: #FFFFFF; margin-top: 4px;">168 cm</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px; text-align: center;">
+                  <div style="font-size: 12px; color: #9CA3AF;">Tỷ lệ mỡ (Fat)</div>
+                  <div style="font-size: 20px; font-weight: 800; color: #10B981; margin-top: 4px;">18.5%</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px; text-align: center;">
+                  <div style="font-size: 12px; color: #9CA3AF;">Khối cơ (Muscle)</div>
+                  <div style="font-size: 20px; font-weight: 800; color: #3B82F6; margin-top: 4px;">52.3 kg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN/OPERATIONS DASHBOARD -->
+        <div id="adminOperationsView">
+
+          <!-- Dashboard Greeting -->
+          <div class="dashboard-greeting">
+            <div>
+              <h2 id="greetingTitle">Chào Quản lý Văn Điền! 👋</h2>
+
+              <p id="greetingSubtitle">Tổng quan tình hình kinh doanh và vận hành phòng tập</p>
+            </div>
+            <div class="dashboard-actions">
+              <button class="btn btn-primary" onclick="openQuickCheckInModal()">
+                <i class="fa fa-qrcode"></i> Check-in nhanh
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Top Stat Cards -->
+          <div class="stats-grid" id="statsGrid">
+            <!-- Populated by dashboard.js -->
+          </div>
+
+          <!-- 2 Column Tables Grid -->
+          <div class="dashboard-grid">
+            <!-- Left: Recent Check-in -->
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <div class="card-title-lg">Hội viên check-in gần đây</div>
+                <a href="member.html#attendance" class="card-action-link">Xem tất cả <i class="fa fa-arrow-right"></i></a>
+              </div>
+
+              <div class="table-container">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Hội viên</th>
+                      <th>Mã HV</th>
+                      <th>Giờ vào</th>
+                      <th>Hình thức</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentCheckInTable">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right: Upcoming Bookings -->
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <div class="card-title-lg">Booking sắp tới</div>
+                <a href="trainer.html#bookings" class="card-action-link">Xem tất cả <i class="fa fa-arrow-right"></i></a>
+              </div>
+
+              <div class="table-container">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Giờ</th>
+                      <th>Hội viên</th>
+                      <th>Huấn luyện viên</th>
+                      <th>Ghi chú</th>
+                    </tr>
+                  </thead>
+                  <tbody id="upcomingBookingTable">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Grid (Neon Red Revenue & Weekly Attendance) -->
+          <div class="dashboard-grid">
+            <!-- Revenue Bar Chart -->
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <div class="card-title-lg"><i class="fa fa-chart-bar" style="color: var(--primary-red); margin-right: 8px;"></i> Doanh thu 6 tháng gần nhất</div>
+                <span class="badge badge-red">+18.5% so với kỳ trước</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="revenueChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Attendance Line Chart -->
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <div class="card-title-lg"><i class="fa fa-chart-line" style="color: var(--accent-green); margin-right: 8px;"></i> Tần suất Hội viên trong tuần</div>
+                <span class="badge badge-green">Hôm nay: 84 lượt</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="attendanceChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Quick Check-in Modal -->
+  <div id="quickCheckInModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa fa-id-card text-red"></i> Điểm danh Check-in</h3>
+        <button class="btn-close-modal" onclick="closeModal('quickCheckInModal')">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Chọn hội viên</label>
+        <select id="quickCheckInMember" class="form-control">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Hình thức tập</label>
+        <select id="quickCheckInType" class="form-control">
+          <option value="Gym & Fitness">Gym & Fitness</option>
+          <option value="Cardio">Cardio</option>
+          <option value="Yoga">Yoga</option>
+          <option value="Boxing">Boxing</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="closeModal('quickCheckInModal')">Hủy</button>
+        <button class="btn btn-primary" onclick="handleQuickCheckIn()"><i class="fa fa-check"></i> Xác nhận Check-in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/mock_data.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>
