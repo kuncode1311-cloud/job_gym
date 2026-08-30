@@ -98,14 +98,40 @@ async function loadMembers(query = '', statusFilter = 'all') {
   const isAdmin = currentUser.Role === 'Admin' || currentUser.Role === 'Manager';
 
   tableBody.innerHTML = members.map(m => {
-    let statusBadge = `<span class="badge badge-green" style="gap: 4px;"><i class="fa fa-check-circle"></i> Đang hoạt động</span>`;
-    if (m.Status === 'Pending' || m.Status === 'Chờ thanh toán') {
-      statusBadge = `<span class="badge badge-yellow" style="gap: 4px;"><i class="fa fa-clock"></i> Chờ thanh toán</span>`;
-    } else if (m.Status === 'Expired' || m.Status === 'Hết hạn') {
-      statusBadge = `<span class="badge badge-red" style="gap: 4px;"><i class="fa fa-ban"></i> Hết hạn</span>`;
+    const isPaid = m.PaymentStatus === 'Paid' || m.Status === 'Active';
+    const isPending = m.PaymentStatus === 'Pending' || m.Status === 'Pending' || m.Status === 'Chờ thanh toán';
+    const isExpired = m.Status === 'Expired' || m.Status === 'Hết hạn';
+
+    let paymentHtml = '';
+    let statusHtml = '';
+
+    if (isPending) {
+      paymentHtml = `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="badge badge-yellow" style="font-size: 11px; padding: 2px 8px; width: fit-content;"><i class="fa fa-clock"></i> Chờ thanh toán</span>
+          <span style="font-size: 11.5px; color: #FF334B; font-weight: 700;">Chưa thu tiền</span>
+        </div>
+      `;
+      statusHtml = `<span class="badge badge-yellow" style="font-size: 11.5px;">Chờ kích hoạt</span>`;
+    } else if (isExpired) {
+      paymentHtml = `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="badge badge-red" style="font-size: 11px; padding: 2px 8px; width: fit-content;"><i class="fa fa-ban"></i> Hết hạn gói</span>
+          <span style="font-size: 11.5px; color: #9CA3AF;">${m.PaymentMethod || 'Đã tất toán'}</span>
+        </div>
+      `;
+      statusHtml = `<span class="badge badge-red" style="font-size: 11.5px;">Đã hết hạn</span>`;
+    } else {
+      paymentHtml = `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="badge badge-green" style="font-size: 11px; padding: 2px 8px; width: fit-content;"><i class="fa fa-check-circle"></i> Đã thanh toán</span>
+          <span style="font-size: 11.5px; color: #60A5FA; font-weight: 600;"><i class="fa fa-credit-card" style="font-size: 10px;"></i> ${m.PaymentMethod || 'VietQR'}</span>
+        </div>
+      `;
+      statusHtml = `<span class="badge badge-green" style="font-size: 11.5px;">Đang hoạt động</span>`;
     }
 
-    const isPending = m.Status === 'Pending' || m.Status === 'Chờ thanh toán';
+    const priceText = m.Price ? formatVND(m.Price) : '';
 
     return `
       <tr>
@@ -118,16 +144,25 @@ async function loadMembers(query = '', statusFilter = 'all') {
             </div>
           </div>
         </td>
-        <td class="code-highlight">${m.Code || `HV-${m.MemberID}`}</td>
+        <td class="code-highlight" style="font-weight: 800;">${m.Code || `HV-${m.MemberID}`}</td>
         <td>${m.Phone || '—'}</td>
-        <td style="font-weight: 600;">${m.PackageName || 'Chưa đăng ký'}</td>
-        <td>${formatDate(m.JoinDate)}</td>
-        <td>${formatDate(m.EndDate) || '—'}</td>
         <td>
-          ${statusBadge}
+          <div style="font-weight: 700; color: #FFFFFF;">${m.PackageName || 'Chưa đăng ký'}</div>
+          ${priceText ? `<div style="font-size: 11.5px; color: #9CA3AF;">${priceText}</div>` : ''}
         </td>
         <td>
-          <div class="action-btn-group">
+          ${paymentHtml}
+        </td>
+        <td>
+          <div style="font-size: 12px; color: #FFFFFF; font-weight: 600;">
+            ${formatDate(m.JoinDate)} <span style="color: #9CA3AF; margin: 0 2px;">➔</span> ${formatDate(m.EndDate) || '—'}
+          </div>
+        </td>
+        <td style="text-align: center;">
+          ${statusHtml}
+        </td>
+        <td>
+          <div class="action-btn-group" style="justify-content: flex-end;">
             ${isPending ? `
               <button class="btn btn-primary btn-sm" style="font-size: 11.5px; padding: 4px 10px; font-weight: 700;" onclick="openCollectPaymentModal(${m.MemberID})" title="Thu tiền &amp; Kích hoạt gói ngay">
                 <i class="fa fa-qrcode"></i> Thu tiền
@@ -157,6 +192,7 @@ async function loadMembers(query = '', statusFilter = 'all') {
     `;
   }).join('');
 }
+
 
 
 function handleMemberSearch() {
@@ -189,21 +225,37 @@ async function openViewMemberDetailModal(id) {
   const statusEl = document.getElementById('vmdStatus');
   const joinDateEl = document.getElementById('vmdJoinDate');
   const endDateEl = document.getElementById('vmdEndDate');
-  const addressEl = document.getElementById('vmdAddress');
+  const paymentMethodEl = document.getElementById('vmdPaymentMethod');
 
   if (avatarEl) avatarEl.textContent = member.Fullname.split(' ').pop()[0];
   if (nameEl) nameEl.textContent = member.Fullname;
   if (codeEl) codeEl.textContent = `Mã HV: ${member.Code || 'HV-' + member.MemberID}`;
   if (phoneEl) phoneEl.textContent = member.Phone || '—';
   if (emailEl) emailEl.textContent = member.Email || '—';
-  if (packageEl) packageEl.textContent = member.PackageName || 'Chưa đăng ký';
-  if (statusEl) statusEl.innerHTML = `<span class="badge ${member.Status === 'Active' ? 'badge-green' : 'badge-red'}">${member.Status === 'Active' ? 'Đang hoạt động' : 'Hết hạn'}</span>`;
+  if (packageEl) packageEl.textContent = member.PackageName ? `${member.PackageName} (${member.Price ? formatVND(member.Price) : ''})` : 'Chưa đăng ký';
+  if (statusEl) {
+    if (member.Status === 'Active' || member.PaymentStatus === 'Paid') {
+      statusEl.innerHTML = `<span class="badge badge-green"><i class="fa fa-check-circle"></i> Đang hoạt động</span>`;
+    } else if (member.Status === 'Pending' || member.PaymentStatus === 'Pending') {
+      statusEl.innerHTML = `<span class="badge badge-yellow"><i class="fa fa-clock"></i> Chờ thanh toán</span>`;
+    } else {
+      statusEl.innerHTML = `<span class="badge badge-red"><i class="fa fa-ban"></i> Hết hạn</span>`;
+    }
+  }
+  if (paymentMethodEl) {
+    if (member.Status === 'Pending' || member.PaymentStatus === 'Pending') {
+      paymentMethodEl.innerHTML = `<span style="color: #FF334B; font-weight: 700;"><i class="fa fa-exclamation-circle"></i> Chưa thu tiền (Chờ TT)</span>`;
+    } else {
+      paymentMethodEl.innerHTML = `<span style="color: #10B981; font-weight: 700;"><i class="fa fa-check-circle"></i> Đã thanh toán (${member.PaymentMethod || 'VietQR'})</span>`;
+    }
+  }
   if (joinDateEl) joinDateEl.textContent = formatDate(member.JoinDate);
   if (endDateEl) endDateEl.textContent = formatDate(member.EndDate) || '—';
   if (addressEl) addressEl.textContent = member.Address || 'Chưa cập nhật địa chỉ';
 
   openModal('viewMemberDetailModal');
 }
+
 
 async function openEditMemberModal(id) {
   const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { Role: 'Admin' };

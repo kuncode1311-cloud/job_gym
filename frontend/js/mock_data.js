@@ -5,7 +5,7 @@
  * ==============================================================================
  */
 
-const STORAGE_KEY = 'GYM_MANAGEMENT_DB_V6';
+const STORAGE_KEY = 'GYM_MANAGEMENT_DB_V7';
 
 
 
@@ -25,13 +25,14 @@ const DEFAULT_DATABASE = {
   
   // 2. Bảng members (6 bản ghi chuẩn từ SQL)
   members: [
-    { MemberID: 1, Code: 'HV-1001', Fullname: 'Nguyễn Văn An', Gender: 'Male', BirthDate: '2002-05-15', Phone: '0901234567', Email: 'an@gmail.com', Address: 'TP. Hồ Chí Minh', JoinDate: '2026-01-10', UserID: 5, PackageName: 'Gói 1 tháng', Status: 'Active', EndDate: '2026-02-10' },
-    { MemberID: 2, Code: 'HV-1002', Fullname: 'Trần Thị Bình', Gender: 'Female', BirthDate: '2003-08-20', Phone: '0912345678', Email: 'binh@gmail.com', Address: 'TP. Hồ Chí Minh', JoinDate: '2026-01-15', UserID: 6, PackageName: 'Gói 3 tháng', Status: 'Active', EndDate: '2026-04-15' },
-    { MemberID: 3, Code: 'HV-1003', Fullname: 'Lê Minh Cường', Gender: 'Male', BirthDate: '2001-11-10', Phone: '0923456789', Email: 'cuong@gmail.com', Address: 'Củ Chi', JoinDate: '2026-02-01', UserID: 7, PackageName: 'Gói 6 tháng', Status: 'Active', EndDate: '2026-08-01' },
-    { MemberID: 4, Code: 'HV-1004', Fullname: 'Phạm Hoàng Nam', Gender: 'Male', BirthDate: '2004-03-25', Phone: '0934567890', Email: 'nam@gmail.com', Address: 'Bình Dương', JoinDate: '2026-02-10', UserID: 5, PackageName: 'Gói 12 tháng', Status: 'Active', EndDate: '2027-02-10' },
-    { MemberID: 5, Code: 'HV-1005', Fullname: 'Võ Ngọc Mai', Gender: 'Female', BirthDate: '2002-12-05', Phone: '0945678901', Email: 'mai@gmail.com', Address: 'Thủ Đức', JoinDate: '2026-02-20', UserID: 6, PackageName: 'Gói Premium 3 tháng', Status: 'Active', EndDate: '2026-05-20' },
-    { MemberID: 6, Code: 'HV-1006', Fullname: 'Đặng Quốc Huy', Gender: 'Male', BirthDate: '2003-06-18', Phone: '0956789012', Email: 'huy@gmail.com', Address: 'Quận 9', JoinDate: '2026-03-01', UserID: 7, PackageName: 'Gói 1 tháng', Status: 'Active', EndDate: '2026-04-01' }
+    { MemberID: 1, Code: 'HV-1001', Fullname: 'Nguyễn Văn An', Gender: 'Male', BirthDate: '2002-05-15', Phone: '0901234567', Email: 'an@gmail.com', Address: 'TP. Hồ Chí Minh', JoinDate: '2026-01-10', UserID: 5, PackageName: 'Gói 1 tháng', Price: 500000, PaymentStatus: 'Paid', PaymentMethod: 'VietQR', Status: 'Active', EndDate: '2026-02-10' },
+    { MemberID: 2, Code: 'HV-1002', Fullname: 'Trần Thị Bình', Gender: 'Female', BirthDate: '2003-08-20', Phone: '0912345678', Email: 'binh@gmail.com', Address: 'TP. Hồ Chí Minh', JoinDate: '2026-01-15', UserID: 6, PackageName: 'Gói 3 tháng', Price: 1300000, PaymentStatus: 'Paid', PaymentMethod: 'Tiền mặt', Status: 'Active', EndDate: '2026-04-15' },
+    { MemberID: 3, Code: 'HV-1003', Fullname: 'Lê Minh Cường', Gender: 'Male', BirthDate: '2001-11-10', Phone: '0923456789', Email: 'cuong@gmail.com', Address: 'Củ Chi', JoinDate: '2026-02-01', UserID: 7, PackageName: 'Gói 6 tháng', Price: 2400000, PaymentStatus: 'Paid', PaymentMethod: 'VietQR', Status: 'Active', EndDate: '2026-08-01' },
+    { MemberID: 4, Code: 'HV-1004', Fullname: 'Phạm Hoàng Nam', Gender: 'Male', BirthDate: '2004-03-25', Phone: '0934567890', Email: 'nam@gmail.com', Address: 'Bình Dương', JoinDate: '2026-02-10', UserID: 5, PackageName: 'Gói 12 tháng', Price: 4200000, PaymentStatus: 'Paid', PaymentMethod: 'Thẻ POS', Status: 'Active', EndDate: '2027-02-10' },
+    { MemberID: 5, Code: 'HV-1005', Fullname: 'Võ Ngọc Mai', Gender: 'Female', BirthDate: '2002-12-05', Phone: '0945678901', Email: 'mai@gmail.com', Address: 'Thủ Đức', JoinDate: '2026-02-20', UserID: 6, PackageName: 'Gói Premium 3 tháng', Price: 2000000, PaymentStatus: 'Paid', PaymentMethod: 'VietQR', Status: 'Active', EndDate: '2026-05-20' },
+    { MemberID: 6, Code: 'HV-1006', Fullname: 'Đặng Quốc Huy', Gender: 'Male', BirthDate: '2003-06-18', Phone: '0956789012', Email: 'huy@gmail.com', Address: 'Quận 9', JoinDate: '2026-03-01', UserID: 7, PackageName: 'Gói 1 tháng', Price: 500000, PaymentStatus: 'Paid', PaymentMethod: 'Tiền mặt', Status: 'Active', EndDate: '2026-04-01' }
   ],
+
 
   // 3. Bảng packages (5 bản ghi chuẩn từ SQL)
   packages: [
