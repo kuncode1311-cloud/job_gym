@@ -404,6 +404,32 @@ const GymAPI = {
     return { success: false, message: 'Không tìm thấy sản phẩm' };
   },
 
+  /**
+   * Xóa sản phẩm khỏi kho (Dành cho Admin)
+   */
+  async deleteInventoryItem(id) {
+    const db = MockDB.getDB();
+    db.inventory = db.inventory.filter(i => i.ID !== Number(id));
+    MockDB.saveDB(db);
+    return { success: true };
+  },
+
+  /**
+   * Nhập thêm số lượng tồn kho (Dành cho Staff & Admin)
+   */
+  async incrementInventoryStock(id, addQuantity) {
+    const db = MockDB.getDB();
+    const item = db.inventory.find(i => i.ID === Number(id));
+    if (item) {
+      item.Stock = (item.Stock || 0) + Number(addQuantity);
+      item.Status = item.Stock > 0 ? 'Còn hàng' : 'Hết hàng';
+      MockDB.saveDB(db);
+      return { success: true, data: item };
+    }
+    return { success: false, message: 'Không tìm thấy sản phẩm' };
+  },
+
+
   // ============================================================================
   // 9. NHÓM CHỨC NĂNG BẢNG LƯƠNG & CHẤM CÔNG (SALARIES)
   // ============================================================================

@@ -412,8 +412,12 @@ async function loadInventory(category = 'all') {
 
   const addBtn = document.getElementById('addInventoryBtn');
   const actionTh = document.getElementById('inventoryActionTh');
+
   if (addBtn) addBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-  if (actionTh) actionTh.style.display = isAdmin ? 'table-cell' : 'none';
+  if (actionTh) {
+    actionTh.style.display = 'table-cell';
+    actionTh.textContent = isAdmin ? 'Thao tác' : 'Nhập hàng';
+  }
 
   currentInventoryCategory = category;
   let items = await GymAPI.getInventory();
@@ -426,23 +430,29 @@ async function loadInventory(category = 'all') {
       <td style="font-weight: 700; color: #FFFFFF;">${i.Name}</td>
       <td><span class="badge badge-blue">${i.Category}</span></td>
       <td class="price-highlight">${formatVND(i.Price)}</td>
-      <td>${i.Stock !== undefined ? i.Stock : 100}</td>
+      <td style="font-weight: 700; color: #E5E7EB;">${i.Stock !== undefined ? i.Stock : 100}</td>
       <td>
         <span class="badge ${i.Status === 'Còn hàng' ? 'badge-green' : 'badge-red'}">
           ${i.Status}
         </span>
       </td>
-      ${isAdmin ? `
       <td>
-        <button class="btn btn-secondary btn-sm" onclick="openEditInventoryModal(${i.ID})">
-          <i class="fa fa-edit"></i> Sửa
-        </button>
+        ${isAdmin ? `
+          <button class="btn btn-secondary btn-sm" onclick="openEditInventoryModal(${i.ID})" title="Sửa sản phẩm">
+            <i class="fa fa-edit"></i> Sửa
+          </button>
+          <button class="btn btn-sm" style="background: rgba(255,51,75,0.15); color: #FF334B; border: 1px solid rgba(255,51,75,0.3); margin-left: 6px;" onclick="handleDeleteInventory(${i.ID})" title="Xóa sản phẩm">
+            <i class="fa fa-trash"></i> Xóa
+          </button>
+        ` : `
+          <button class="btn btn-secondary btn-sm" style="background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid rgba(16,185,129,0.3); font-weight: 600;" onclick="openStaffStockModal(${i.ID})">
+            <i class="fa fa-plus"></i> Thêm số lượng
+          </button>
+        `}
       </td>
-      ` : ''}
     </tr>
   `).join('');
 }
-
 
 function filterInventory(category, event) {
   document.querySelectorAll('#inventoryTabs .tab-btn').forEach(b => b.classList.remove('active'));
@@ -471,6 +481,42 @@ async function openEditInventoryModal(id) {
   openModal('inventoryModal');
 }
 
+async function handleDeleteInventory(id) {
+  if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi kho hàng?')) return;
+  await GymAPI.deleteInventoryItem(id);
+  showToast('Đã xóa sản phẩm khỏi kho hàng thành công!', 'success');
+  loadInventory(currentInventoryCategory);
+}
+
+async function openStaffStockModal(id) {
+  const items = await GymAPI.getInventory();
+  const item = items.find(i => i.ID === Number(id));
+  if (!item) return;
+
+  document.getElementById('staffStockItemId').value = item.ID;
+  document.getElementById('staffStockItemName').value = item.Name;
+  document.getElementById('staffStockCurrent').value = item.Stock !== undefined ? item.Stock : 0;
+  document.getElementById('staffStockAddQty').value = '';
+  openModal('staffStockModal');
+}
+
+async function handleStaffStockIncrement(e) {
+  e.preventDefault();
+  const id = document.getElementById('staffStockItemId').value;
+  const addQty = Number(document.getElementById('staffStockAddQty').value);
+  const itemName = document.getElementById('staffStockItemName').value;
+
+  if (isNaN(addQty) || addQty <= 0) {
+    showToast('Vui lòng nhập số lượng hợp lệ (> 0)', 'error');
+    return;
+  }
+
+  await GymAPI.incrementInventoryStock(id, addQty);
+  showToast(`Đã nhập thêm +${addQty} ${itemName} vào kho thành công!`, 'success');
+  closeModal('staffStockModal');
+  loadInventory(currentInventoryCategory);
+}
+
 async function handleSaveInventory(e) {
   e.preventDefault();
   const id = document.getElementById('invId').value;
@@ -488,13 +534,17 @@ async function handleSaveInventory(e) {
     await GymAPI.addInventoryItem(itemData);
     showToast('Thêm sản phẩm mới thành công!', 'success');
   }
-
   closeModal('inventoryModal');
   loadInventory(currentInventoryCategory);
 }
 
+window.openStaffStockModal = openStaffStockModal;
+window.handleStaffStockIncrement = handleStaffStockIncrement;
+window.handleDeleteInventory = handleDeleteInventory;
+
 // ==============================================================================
 // 4. CHẤM CÔNG NHÂN SỰ (ATTENDANCE MANAGE)
+
 // ==============================================================================
 
 async function loadStaffAttendance() {
