@@ -332,7 +332,7 @@ button, input, select, textarea {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 28px;
 }
 
 /* Card Header Flex Layout (Title on left, Button on right) */
@@ -341,10 +341,11 @@ button, input, select, textarea {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 20px;
-  gap: 16px;
+  margin-bottom: 22px;
+  gap: 18px;
   box-sizing: border-box;
 }
+
 
 .card-title-lg {
   font-family: var(--font-heading);
@@ -883,11 +884,17 @@ select.form-control option, select option {
     padding: 20px 24px;
     gap: 24px;
   }
+}
+
+/* --- Breakpoint: Tablet & iPad (< 880px) --- */
+@media (max-width: 880px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+    margin-bottom: 24px;
   }
 }
+
 
 /* --- Breakpoint: Tablet & iPad (< 992px) --- */
 @media (max-width: 992px) {

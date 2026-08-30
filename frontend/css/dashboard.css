@@ -37,8 +37,10 @@
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 28px;
+  margin-bottom: 28px;
 }
+
 
 .card-header-flex {
   display: flex;
