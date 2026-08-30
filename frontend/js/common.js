@@ -216,7 +216,7 @@ function initSidebarNavigation() {
     ];
   } else if (currentUser.Role === 'Staff') {
     menuItems = [
-      { name: 'Dashboard', link: 'dashboard.html', icon: 'fa-home' },
+      { name: 'Bán hàng', link: 'dashboard.html', icon: 'fa-cash-register' },
       { name: 'Hội viên', link: 'member.html', icon: 'fa-user-friends' },
       { name: 'Thanh toán', link: 'admin.html#payments', icon: 'fa-file-invoice-dollar' },
       { name: 'Kho', link: 'admin.html#inventory', icon: 'fa-boxes' },
@@ -224,6 +224,7 @@ function initSidebarNavigation() {
       { name: 'Booking', link: 'trainer.html#bookings', icon: 'fa-calendar-alt' },
       { name: 'Lương cá nhân', link: 'admin.html#my_salary', icon: 'fa-wallet' }
     ];
+
   } else if (currentUser.Role === 'Trainer') {
     menuItems = [
       { name: 'Dashboard', link: 'dashboard.html', icon: 'fa-home' },

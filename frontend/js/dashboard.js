@@ -31,20 +31,8 @@ function renderGreetingAndStats() {
     if (memberDashboardView) memberDashboardView.style.display = 'none';
     if (adminOperationsView) adminOperationsView.style.display = 'none';
 
-    // Populate staff profile details
-    const nameHeader = document.getElementById('staffFullNameHeader');
-    const usernameInput = document.getElementById('staffUsername');
-    const roleInput = document.getElementById('staffRole');
-    const emailInput = document.getElementById('staffEmail');
-    const phoneInput = document.getElementById('staffPhone');
-    const joinDateInput = document.getElementById('staffJoinDate');
-
-    if (nameHeader) nameHeader.textContent = currentUser.Fullname || 'Lâm Văn Cường';
-    if (usernameInput) usernameInput.value = currentUser.Username || 'vancuong_staff';
-    if (roleInput) roleInput.value = 'Nhân viên hỗ trợ';
-    if (emailInput) emailInput.value = currentUser.Email || 'vancuong@gmail.com';
-    if (phoneInput) phoneInput.value = currentUser.Phone || '0901111222';
-    if (joinDateInput) joinDateInput.value = '2025-06-15';
+    loadStaffPosItems('all');
+    loadStaffRecentAttendees();
     return;
   }
 
@@ -58,6 +46,7 @@ function renderGreetingAndStats() {
     if (trainerGreeting) trainerGreeting.textContent = `Chào ${currentUser.Fullname || 'Trần Quốc Bảo'}! 🏋️`;
     return;
   }
+
 
   if (currentUser.Role === 'Member') {
     if (staffProfileView) staffProfileView.style.display = 'none';
@@ -278,3 +267,130 @@ async function openQuickCheckInModal() {
 
 window.openQuickCheckInModal = openQuickCheckInModal;
 window.handleQuickCheckIn = handleQuickCheckIn;
+
+// ==============================================================================
+// STAFF DASHBOARD / QUẦY BÁN HÀNG & LỄ TÂN (POS)
+// ==============================================================================
+
+let currentStaffPosCategory = 'all';
+
+async function loadStaffPosItems(category = 'all') {
+  const tableBody = document.getElementById('staffPosTableBody');
+  if (!tableBody) return;
+
+  currentStaffPosCategory = category;
+
+  // Lấy danh sách sản phẩm từ kho và gói tập từ database
+  const inventoryItems = await GymAPI.getInventory();
+  const packages = await GymAPI.getPackages();
+
+  // Chuyển packages thành định dạng sản phẩm bán hàng
+  const packageItems = packages.map(p => ({
+    ID: `PKG-${p.PackageID}`,
+    Name: p.PackageName,
+    Category: 'Gói tập',
+    Price: p.Price,
+    Stock: 'Không giới hạn',
+    Status: 'Còn hàng'
+  }));
+
+  let allProducts = [...packageItems, ...inventoryItems];
+
+  if (category !== 'all') {
+    allProducts = allProducts.filter(p => p.Category === category);
+  }
+
+  tableBody.innerHTML = allProducts.map(item => {
+    let catBadgeClass = 'badge-blue';
+    if (item.Category === 'Gói tập') catBadgeClass = 'badge-green';
+    else if (item.Category === 'Phụ kiện') catBadgeClass = 'badge-yellow';
+    else if (item.Category === 'Dịch vụ') catBadgeClass = 'badge-red';
+
+    const stockDisplay = typeof item.Stock === 'number' ? `${item.Stock} cái/chai` : item.Stock;
+
+    return `
+      <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+        <td style="font-weight: 700; color: #FFFFFF; padding: 12px 14px;">${item.Name}</td>
+        <td style="padding: 12px 14px;"><span class="badge ${catBadgeClass}">${item.Category}</span></td>
+        <td style="color: #FF334B; font-weight: 700; padding: 12px 14px;">${formatVND(item.Price)}</td>
+        <td style="color: #9CA3AF; padding: 12px 14px; font-size: 13px;">${stockDisplay}</td>
+        <td style="text-align: center; padding: 12px 14px;">
+          <button class="btn btn-primary btn-sm" style="font-weight: 700; padding: 6px 14px;" onclick="handleStaffQuickSell('${item.Name}', ${item.Price})">
+            <i class="fa fa-shopping-cart"></i> Bán ngay
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterStaffPos(category, event) {
+  document.querySelectorAll('#staffPosTabs .tab-btn').forEach(b => b.classList.remove('active'));
+  if (event && event.target) event.target.classList.add('active');
+  loadStaffPosItems(category);
+}
+
+async function handleStaffQuickSell(itemName, price) {
+  await GymAPI.addPayment({
+    MemberName: 'Khách mua tại quầy (Khách vãng lai)',
+    PackageName: itemName,
+    Amount: price,
+    PaymentMethod: 'Tiền mặt'
+  });
+
+  showToast(`Đã thanh toán thành công: ${itemName} (${formatVND(price)})!`, 'success');
+}
+
+async function loadStaffRecentAttendees() {
+  const container = document.getElementById('staffRecentCheckInList');
+  if (!container) return;
+
+  const attendanceList = await GymAPI.getAttendance();
+  const recent = attendanceList.slice(0, 5);
+
+  container.innerHTML = recent.map(item => `
+    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);"></div>
+        <div>
+          <div style="font-weight: 700; color: #FFFFFF; font-size: 13.5px;">${item.MemberName}</div>
+          <div style="font-size: 12px; color: #9CA3AF; margin-top: 1px;">${item.MemberCode || `HV-10${item.MemberID}`} • ${item.CheckInTime}</div>
+        </div>
+      </div>
+      <span class="badge badge-green" style="font-size: 11.5px; padding: 4px 10px;">Đang tập</span>
+    </div>
+  `).join('');
+}
+
+async function handleStaffQuickCheckIn() {
+  const inp = document.getElementById('staffQuickCheckInInp');
+  if (!inp || !inp.value.trim()) {
+    showToast('Vui lòng nhập mã hội viên hoặc tên', 'error');
+    return;
+  }
+
+  const term = inp.value.trim();
+  const members = await GymAPI.getMembers();
+  const found = members.find(m => 
+    m.Code.toLowerCase() === term.toLowerCase() || 
+    m.Fullname.toLowerCase().includes(term.toLowerCase())
+  );
+
+  if (found) {
+    const res = await GymAPI.checkIn(found.MemberID, found.PackageName || 'Gym & Fitness');
+    if (res.success) {
+      showToast(`Check-in thành công: ${found.Fullname} (${found.Code})`, 'success');
+      inp.value = '';
+      loadStaffRecentAttendees();
+    }
+  } else {
+    showToast('Không tìm thấy mã hội viên này trong hệ thống', 'error');
+  }
+}
+
+window.filterStaffPos = filterStaffPos;
+window.handleStaffQuickSell = handleStaffQuickSell;
+window.handleStaffQuickCheckIn = handleStaffQuickCheckIn;
+window.loadStaffPosItems = loadStaffPosItems;
+window.loadStaffRecentAttendees = loadStaffRecentAttendees;
+
