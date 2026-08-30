@@ -330,6 +330,9 @@ function filterStaffPos(category, event) {
   loadStaffPosItems(category);
 }
 
+let currentShiftRevenue = 2850000;
+let currentShiftOrders = 8;
+
 async function handleStaffQuickSell(itemName, price) {
   await GymAPI.addPayment({
     MemberName: 'Khách mua tại quầy (Khách vãng lai)',
@@ -338,8 +341,15 @@ async function handleStaffQuickSell(itemName, price) {
     PaymentMethod: 'Tiền mặt'
   });
 
+  currentShiftRevenue += Number(price);
+  currentShiftOrders += 1;
+
+  const revEl = document.getElementById('staffShiftRevenue');
+  if (revEl) revEl.textContent = formatVND(currentShiftRevenue);
+
   showToast(`Đã thanh toán thành công: ${itemName} (${formatVND(price)})!`, 'success');
 }
+
 
 async function loadStaffRecentAttendees() {
   const container = document.getElementById('staffRecentCheckInList');
