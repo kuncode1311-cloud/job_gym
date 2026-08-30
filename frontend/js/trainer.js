@@ -343,22 +343,24 @@ async function loadFeedbacks() {
     const memberName = f.MemberName || 'Hội viên ẩn danh';
     const trainerName = f.TrainerName || (Number(f.TrainerID) === 1 ? 'Nguyễn Minh Tuấn' : (Number(f.TrainerID) === 2 ? 'Trần Quốc Hùng' : 'Phòng tập & Dịch vụ'));
     const trainerBadgeClass = Number(f.TrainerID) === 1 ? 'badge-green' : (Number(f.TrainerID) === 2 ? 'badge-blue' : 'badge-yellow');
+    const formattedDate = formatDate(f.FeedbackDate) || f.FeedbackDate;
 
     return `
       <tr>
-        <td style="font-weight: 700; color: #9CA3AF; padding: 12px 16px; width: 60px;">#${f.FeedbackID}</td>
-        <td style="font-weight: 700; color: #FFFFFF; padding: 12px 16px;">${memberName}</td>
-        <td style="padding: 12px 16px;"><span class="badge ${trainerBadgeClass}">${trainerName}</span></td>
-        <td style="color: #F59E0B; font-weight: 700; padding: 12px 16px; font-size: 13px;">
-          ${stars} <span style="color: #FFFFFF; font-size: 12px; margin-left: 2px;">(${f.Rating}/5)</span>
+        <td style="font-weight: 700; color: #9CA3AF; padding: 12px 14px; width: 70px;">#${f.FeedbackID}</td>
+        <td style="font-weight: 700; color: #FFFFFF; padding: 12px 14px; width: 170px;">${memberName}</td>
+        <td style="padding: 12px 14px; width: 180px;"><span class="badge ${trainerBadgeClass}">${trainerName}</span></td>
+        <td style="color: #F59E0B; font-weight: 700; padding: 12px 14px; font-size: 13.5px; width: 140px; white-space: nowrap;">
+          ${stars} <span style="color: #FFFFFF; font-size: 12px; margin-left: 3px;">(${f.Rating}/5)</span>
         </td>
-        <td style="color: #E5E7EB; padding: 12px 16px; line-height: 1.4;">
+        <td style="color: #E5E7EB; padding: 12px 14px; line-height: 1.45;">
           ${f.Comment || f.Commemt || ''}
         </td>
-        <td style="color: #9CA3AF; padding: 12px 16px; text-align: center;">${f.FeedbackDate}</td>
+        <td style="color: #9CA3AF; padding: 12px 14px; text-align: center; width: 120px; white-space: nowrap;">${formattedDate}</td>
       </tr>
     `;
   }).join('');
+
 
 }
 
