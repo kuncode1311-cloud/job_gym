@@ -94,6 +94,9 @@ async function loadMembers(query = '', statusFilter = 'all') {
   const memberCountEl = document.getElementById('totalMemberCount');
   if (memberCountEl) memberCountEl.textContent = `${members.length} Hội viên`;
 
+  const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { Role: 'Admin' };
+  const isAdmin = currentUser.Role === 'Admin' || currentUser.Role === 'Manager';
+
   tableBody.innerHTML = members.map(m => `
     <tr>
       <td>
@@ -117,15 +120,24 @@ async function loadMembers(query = '', statusFilter = 'all') {
       </td>
       <td>
         <div class="action-btn-group">
-          <button class="btn-action-icon" title="Chỉnh sửa" onclick="openEditMemberModal(${m.MemberID})">
-            <i class="fa fa-edit"></i>
-          </button>
-          <button class="btn-action-icon" title="Xem InBody" onclick="viewMemberInBody(${m.MemberID})">
-            <i class="fa fa-heartbeat"></i>
-          </button>
-          <button class="btn-action-icon btn-danger" title="Xóa" onclick="handleDeleteMember(${m.MemberID})">
-            <i class="fa fa-trash"></i>
-          </button>
+          ${isAdmin ? `
+            <button class="btn-action-icon" title="Chỉnh sửa thông tin & gói tập" onclick="openEditMemberModal(${m.MemberID})">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button class="btn-action-icon" title="Xem InBody & Sức khỏe" onclick="viewMemberInBody(${m.MemberID})">
+              <i class="fa fa-heartbeat"></i>
+            </button>
+            <button class="btn-action-icon btn-danger" title="Xóa hội viên" onclick="handleDeleteMember(${m.MemberID})">
+              <i class="fa fa-trash"></i>
+            </button>
+          ` : `
+            <button class="btn-action-icon" title="Xem chi tiết hồ sơ" onclick="openViewMemberDetailModal(${m.MemberID})">
+              <i class="fa fa-eye"></i>
+            </button>
+            <button class="btn-action-icon" title="Xem InBody & Sức khỏe" onclick="viewMemberInBody(${m.MemberID})">
+              <i class="fa fa-heartbeat"></i>
+            </button>
+          `}
         </div>
       </td>
     </tr>
@@ -145,7 +157,42 @@ function openAddMemberModal() {
   openModal('memberModal');
 }
 
+async function openViewMemberDetailModal(id) {
+  const member = await GymAPI.getMemberById(id);
+  if (!member) return;
+
+  const avatarEl = document.getElementById('vmdAvatar');
+  const nameEl = document.getElementById('vmdName');
+  const codeEl = document.getElementById('vmdCode');
+  const phoneEl = document.getElementById('vmdPhone');
+  const emailEl = document.getElementById('vmdEmail');
+  const packageEl = document.getElementById('vmdPackage');
+  const statusEl = document.getElementById('vmdStatus');
+  const joinDateEl = document.getElementById('vmdJoinDate');
+  const endDateEl = document.getElementById('vmdEndDate');
+  const addressEl = document.getElementById('vmdAddress');
+
+  if (avatarEl) avatarEl.textContent = member.Fullname.split(' ').pop()[0];
+  if (nameEl) nameEl.textContent = member.Fullname;
+  if (codeEl) codeEl.textContent = `Mã HV: ${member.Code || 'HV-' + member.MemberID}`;
+  if (phoneEl) phoneEl.textContent = member.Phone || '—';
+  if (emailEl) emailEl.textContent = member.Email || '—';
+  if (packageEl) packageEl.textContent = member.PackageName || 'Chưa đăng ký';
+  if (statusEl) statusEl.innerHTML = `<span class="badge ${member.Status === 'Active' ? 'badge-green' : 'badge-red'}">${member.Status === 'Active' ? 'Đang hoạt động' : 'Hết hạn'}</span>`;
+  if (joinDateEl) joinDateEl.textContent = formatDate(member.JoinDate);
+  if (endDateEl) endDateEl.textContent = formatDate(member.EndDate) || '—';
+  if (addressEl) addressEl.textContent = member.Address || 'Chưa cập nhật địa chỉ';
+
+  openModal('viewMemberDetailModal');
+}
+
 async function openEditMemberModal(id) {
+  const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { Role: 'Admin' };
+  if (currentUser.Role !== 'Admin' && currentUser.Role !== 'Manager') {
+    showToast('Nhân viên chỉ có quyền thêm mới, không được tự ý sửa thông tin hoặc gói tập của hội viên!', 'error');
+    return;
+  }
+
   const member = await GymAPI.getMemberById(id);
   if (!member) return;
 
@@ -200,6 +247,11 @@ async function handleSaveMember(e) {
   };
 
   if (id) {
+    const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { Role: 'Admin' };
+    if (currentUser.Role !== 'Admin' && currentUser.Role !== 'Manager') {
+      showToast('Nhân viên chỉ có quyền thêm mới, không được tự ý sửa thông tin hoặc gói tập của hội viên!', 'error');
+      return;
+    }
     memberData.MemberID = Number(id);
     await GymAPI.updateMember(memberData);
     showToast('Cập nhật thông tin hội viên thành công!', 'success');
@@ -213,12 +265,19 @@ async function handleSaveMember(e) {
 }
 
 async function handleDeleteMember(id) {
+  const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { Role: 'Admin' };
+  if (currentUser.Role !== 'Admin' && currentUser.Role !== 'Manager') {
+    showToast('Nhân viên không có quyền xóa hội viên!', 'error');
+    return;
+  }
+
   if (confirm('Bạn có chắc chắn muốn xóa hội viên này không?')) {
     await GymAPI.deleteMember(id);
     showToast('Đã xóa hội viên thành công', 'info');
     loadMembers();
   }
 }
+
 
 // ==============================================================================
 // 2. QUẢN LÝ ĐIỂM DANH (ATTENDANCE)

@@ -251,27 +251,36 @@ function initSidebarNavigation() {
   // Render HTML danh sách menu
   const currentHash = window.location.hash || '';
 
+  // Tìm menu item phù hợp nhất để active
+  // 1. Ưu tiên 1: Cùng trang VÀ cùng hash (nếu có hash)
+  let activeItemName = null;
+  if (currentHash && currentHash !== '#') {
+    const matchHashItem = menuItems.find(item => {
+      const [itemPage, itemHash] = item.link.split('#');
+      return currentPage === itemPage && itemHash && ('#' + itemHash === currentHash);
+    });
+    if (matchHashItem) activeItemName = matchHashItem.name;
+  }
+
+  // 2. Ưu tiên 2: Cùng trang và không có hash
+  if (!activeItemName) {
+    const matchPageItem = menuItems.find(item => {
+      const [itemPage, itemHash] = item.link.split('#');
+      return currentPage === itemPage && !itemHash;
+    });
+    if (matchPageItem) activeItemName = matchPageItem.name;
+  }
+
+  // 3. Ưu tiên 3: Mục đầu tiên của trang hiện tại
+  if (!activeItemName) {
+    const firstPageItem = menuItems.find(item => item.link.split('#')[0] === currentPage);
+    if (firstPageItem) activeItemName = firstPageItem.name;
+  }
+
   sidebarNav.innerHTML = `
     <ul class="nav-menu">
       ${menuItems.map(item => {
-        const itemPage = item.link.split('#')[0];
-        const itemHash = item.link.includes('#') ? '#' + item.link.split('#')[1] : '';
-
-        let isActive = false;
-        if (currentPage === itemPage) {
-          if (itemHash) {
-            isActive = (currentHash === itemHash);
-          } else {
-            // Mặc định active cho trang khi hash trống
-            if (!currentHash || currentHash === '#') {
-              if (item.name === 'Dashboard' && currentPage === 'dashboard.html') isActive = true;
-              else if (item.name === 'Quản lý Trainer' && currentPage === 'trainer.html') isActive = true;
-              else if (item.name === 'Quản lý hội viên' && currentPage === 'member.html') isActive = true;
-              else if (item.name === 'Quản lý gói tập' && currentPage === 'admin.html') isActive = true;
-            }
-          }
-        }
-
+        const isActive = (item.name === activeItemName);
         return `
           <li class="nav-item">
             <a href="${item.link}" class="nav-link ${isActive ? 'active' : ''}">
@@ -283,6 +292,7 @@ function initSidebarNavigation() {
     </ul>
   `;
 }
+
 
 /**
  * Khởi tạo vùng hiển thị Toast Alert thông báo

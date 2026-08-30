@@ -760,7 +760,64 @@
     </div>
   </div>
 
+  <!-- View Member Detail Modal (Read-only for Staff & Admin) -->
+  <div id="viewMemberDetailModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa fa-id-card text-red"></i> Chi tiết Hồ sơ Hội viên</h3>
+        <button class="btn-close-modal" onclick="closeModal('viewMemberDetailModal')">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+        <div style="display: flex; align-items: center; gap: 16px; background: rgba(255,255,255,0.04); padding: 16px; border-radius: 10px;">
+          <div class="avatar-circle" id="vmdAvatar" style="width: 52px; height: 52px; font-size: 20px;">A</div>
+          <div>
+            <div style="font-size: 18px; font-weight: 800; color: #FFFFFF;" id="vmdName">Nguyễn Văn An</div>
+            <div style="font-size: 13px; color: var(--primary-red); font-weight: 700; margin-top: 2px;" id="vmdCode">Mã HV: HV-1001</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="inbody-metric-box" style="text-align: left; padding: 12px 16px;">
+            <div class="metric-title">Số điện thoại</div>
+            <div class="metric-val" style="font-size: 15px; margin-top: 4px;" id="vmdPhone">0901234567</div>
+          </div>
+          <div class="inbody-metric-box" style="text-align: left; padding: 12px 16px;">
+            <div class="metric-title">Email liên hệ</div>
+            <div class="metric-val" style="font-size: 15px; margin-top: 4px; word-break: break-all;" id="vmdEmail">an@gmail.com</div>
+          </div>
+          <div class="inbody-metric-box" style="text-align: left; padding: 12px 16px;">
+            <div class="metric-title">Gói tập đang dùng</div>
+            <div class="metric-val text-red" style="font-size: 15px; margin-top: 4px;" id="vmdPackage">Gói 1 tháng</div>
+          </div>
+          <div class="inbody-metric-box" style="text-align: left; padding: 12px 16px;">
+            <div class="metric-title">Trạng thái</div>
+            <div class="metric-val" style="font-size: 15px; margin-top: 4px;" id="vmdStatus"><span class="badge badge-green">Đang hoạt động</span></div>
+          </div>
+          <div class="inbody-metric-box" style="text-align: left; padding: 12px 16px;">
+            <div class="metric-title">Ngày tham gia</div>
+            <div class="metric-val" style="font-size: 14px; margin-top: 4px;" id="vmdJoinDate">10/01/2026</div>
+          </div>
+          <div class="inbody-metric-box" style="text-align: left; padding: 12px 16px;">
+            <div class="metric-title">Hạn sử dụng gói</div>
+            <div class="metric-val" style="font-size: 14px; margin-top: 4px;" id="vmdEndDate">10/02/2026</div>
+          </div>
+        </div>
+
+        <div class="inbody-metric-box" style="text-align: left; padding: 12px 16px;">
+          <div class="metric-title">Địa chỉ thường trú</div>
+          <div class="metric-val" style="font-size: 14px; font-weight: 500; margin-top: 4px;" id="vmdAddress">Quận 1, TP. Hồ Chí Minh</div>
+        </div>
+      </div>
+
+      <div style="text-align: right; margin-top: 20px;">
+        <button class="btn btn-secondary" onclick="closeModal('viewMemberDetailModal')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
   <!-- InBody Summary Modal -->
+
   <div id="inbodyModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 600px;">
       <div class="modal-header">
