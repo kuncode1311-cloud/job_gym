@@ -437,18 +437,20 @@ async function loadInventory(category = 'all') {
 
     return `
       <tr>
-        <td style="font-weight: 700; color: #9CA3AF;">#${itemId}</td>
-        <td style="font-weight: 700; color: #FFFFFF;">${itemName}</td>
-        <td style="text-align: center;"><span class="badge ${catBadgeClass}">${i.Category}</span></td>
-        <td style="color: #9CA3AF; font-size: 13px; line-height: 1.4;">${description}</td>
-        <td class="price-highlight">${formatVND(i.Price)}</td>
-        <td style="font-weight: 700; color: #E5E7EB; text-align: center;">${i.Stock !== undefined ? i.Stock : 0}</td>
-        <td style="text-align: center;">
+        <td style="font-weight: 700; color: #9CA3AF; width: 60px;">#${itemId}</td>
+        <td>
+          <div style="font-weight: 700; color: #FFFFFF; font-size: 14.5px;">${itemName}</div>
+          <div style="font-size: 12px; color: #9CA3AF; margin-top: 2px; line-height: 1.35;">${description}</div>
+        </td>
+        <td style="text-align: center; width: 120px;"><span class="badge ${catBadgeClass}">${i.Category}</span></td>
+        <td class="price-highlight" style="width: 110px;">${formatVND(i.Price)}</td>
+        <td style="font-weight: 700; color: #E5E7EB; text-align: center; width: 80px;">${i.Stock !== undefined ? i.Stock : 0}</td>
+        <td style="text-align: center; width: 100px;">
           <span class="badge ${i.Stock > 0 ? 'badge-green' : 'badge-red'}">
             ${i.Stock > 0 ? 'Còn hàng' : 'Hết hàng'}
           </span>
         </td>
-        <td style="text-align: center;">
+        <td style="text-align: center; width: 140px;">
           ${isAdmin ? `
             <button class="btn btn-secondary btn-sm" onclick="openEditInventoryModal(${itemId})" title="Sửa sản phẩm">
               <i class="fa fa-edit"></i> Sửa
@@ -466,6 +468,7 @@ async function loadInventory(category = 'all') {
     `;
   }).join('');
 }
+
 
 function filterInventory(category, event) {
   document.querySelectorAll('#inventoryTabs .tab-btn').forEach(b => b.classList.remove('active'));
