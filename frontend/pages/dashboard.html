@@ -318,10 +318,10 @@
         </div>
 
         <!-- ADMIN/OPERATIONS DASHBOARD -->
-        <div id="adminOperationsView">
+        <div id="adminOperationsView" style="display: flex; flex-direction: column; gap: 24px;">
 
           <!-- Dashboard Greeting -->
-          <div class="dashboard-greeting">
+          <div class="dashboard-greeting" style="margin-bottom: 0;">
             <div>
               <h2 id="greetingTitle">Chào Quản lý Văn Điền! 👋</h2>
 
@@ -335,12 +335,13 @@
           </div>
 
           <!-- 4 Top Stat Cards -->
-          <div class="stats-grid" id="statsGrid">
+          <div class="stats-grid" id="statsGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
             <!-- Populated by dashboard.js -->
           </div>
 
           <!-- 2 Column Tables Grid -->
           <div class="dashboard-grid">
+
             <!-- Left: Recent Check-in -->
             <div class="glass-card">
               <div class="card-header-flex">
