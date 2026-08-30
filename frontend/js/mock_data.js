@@ -5,7 +5,8 @@
  * ==============================================================================
  */
 
-const STORAGE_KEY = 'GYM_MANAGEMENT_DB_V5';
+const STORAGE_KEY = 'GYM_MANAGEMENT_DB_V6';
+
 
 
 // Dữ liệu đúng từng bản ghi trong gym_management.sql

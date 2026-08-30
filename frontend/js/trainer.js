@@ -340,26 +340,26 @@ async function loadFeedbacks() {
 
   tableBody.innerHTML = feedbacks.map(f => {
     const stars = '★'.repeat(f.Rating) + '☆'.repeat(Math.max(0, 5 - f.Rating));
-    const trainerBadgeClass = Number(f.TrainerID) === 1 ? 'badge-green' : 'badge-blue';
+    const memberName = f.MemberName || 'Hội viên ẩn danh';
+    const trainerName = f.TrainerName || (Number(f.TrainerID) === 1 ? 'Nguyễn Minh Tuấn' : (Number(f.TrainerID) === 2 ? 'Trần Quốc Hùng' : 'Phòng tập & Dịch vụ'));
+    const trainerBadgeClass = Number(f.TrainerID) === 1 ? 'badge-green' : (Number(f.TrainerID) === 2 ? 'badge-blue' : 'badge-yellow');
 
     return `
       <tr>
-        <td style="font-weight: 700; color: #FFFFFF; padding: 14px 18px;">${f.FeedbackID}</td>
-        <td style="color: #F59E0B; font-weight: 700; padding: 14px 18px; font-size: 14px;">
-          ${stars} <span style="color: #FFFFFF; font-size: 13px; margin-left: 4px;">${f.Rating}</span>
+        <td style="font-weight: 700; color: #9CA3AF; padding: 12px 16px; width: 60px;">#${f.FeedbackID}</td>
+        <td style="font-weight: 700; color: #FFFFFF; padding: 12px 16px;">${memberName}</td>
+        <td style="padding: 12px 16px;"><span class="badge ${trainerBadgeClass}">${trainerName}</span></td>
+        <td style="color: #F59E0B; font-weight: 700; padding: 12px 16px; font-size: 13px;">
+          ${stars} <span style="color: #FFFFFF; font-size: 12px; margin-left: 2px;">(${f.Rating}/5)</span>
         </td>
-        <td style="color: #E5E7EB; padding: 14px 18px; line-height: 1.5;">
-          ${f.Comment || f.Commemt}
+        <td style="color: #E5E7EB; padding: 12px 16px; line-height: 1.4;">
+          ${f.Comment || f.Commemt || ''}
         </td>
-        <td style="color: #9CA3AF; padding: 14px 18px;">${f.FeedbackDate}</td>
-        <td style="text-align: center; padding: 14px 18px;">
-          <span class="badge ${trainerBadgeClass}" style="width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
-            ${f.TrainerID}
-          </span>
-        </td>
+        <td style="color: #9CA3AF; padding: 12px 16px; text-align: center;">${f.FeedbackDate}</td>
       </tr>
     `;
   }).join('');
+
 }
 
 
