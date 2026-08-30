@@ -303,6 +303,13 @@ function initToastContainer() {
  */
 function showToast(message, type = 'success') {
   const container = document.getElementById('toastContainer') || document.body;
+
+  // Giới hạn tối đa 2 toast hiển thị cùng lúc để không che khuất màn hình
+  const existingToasts = container.querySelectorAll('.toast');
+  if (existingToasts.length >= 2) {
+    existingToasts[0].remove();
+  }
+
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `
@@ -314,12 +321,13 @@ function showToast(message, type = 'success') {
   // Hiệu ứng trượt vào
   setTimeout(() => toast.classList.add('show'), 10);
 
-  // Tự động biến mất sau 3 giây
+  // Tự động biến mất sau 2.5 giây
   setTimeout(() => {
     toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
+    setTimeout(() => toast.remove(), 250);
+  }, 2500);
 }
+
 
 /**
  * Hàm mở Modal Popup

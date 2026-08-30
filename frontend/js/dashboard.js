@@ -280,44 +280,39 @@ async function loadStaffPosItems(category = 'all') {
 
   currentStaffPosCategory = category;
 
-  // Lấy danh sách sản phẩm từ kho và gói tập từ database
-  const inventoryItems = await GymAPI.getInventory();
-  const packages = await GymAPI.getPackages();
-
-  // Chuyển packages thành định dạng sản phẩm bán hàng
-  const packageItems = packages.map(p => ({
-    ID: `PKG-${p.PackageID}`,
-    Name: p.PackageName,
-    Category: 'Gói tập',
-    Price: p.Price,
-    Stock: 'Không giới hạn',
-    Status: 'Còn hàng'
-  }));
-
-  let allProducts = [...packageItems, ...inventoryItems];
+  // Lấy danh sách sản phẩm trực tiếp từ kho hàng trong database
+  let items = await GymAPI.getInventory();
 
   if (category !== 'all') {
-    allProducts = allProducts.filter(p => p.Category === category);
+    items = items.filter(p => p.Category === category);
   }
 
-  tableBody.innerHTML = allProducts.map(item => {
+  tableBody.innerHTML = items.map(item => {
     let catBadgeClass = 'badge-blue';
-    if (item.Category === 'Gói tập') catBadgeClass = 'badge-green';
-    else if (item.Category === 'Phụ kiện') catBadgeClass = 'badge-yellow';
+    if (item.Category === 'Phụ kiện') catBadgeClass = 'badge-yellow';
     else if (item.Category === 'Dịch vụ') catBadgeClass = 'badge-red';
 
-    const stockDisplay = typeof item.Stock === 'number' ? `${item.Stock} cái/chai` : item.Stock;
+    const isOutOfStock = item.Stock !== undefined && item.Stock <= 0;
+    const stockDisplay = isOutOfStock
+      ? '<span class="badge badge-red">Hết hàng (0)</span>'
+      : (typeof item.Stock === 'number' ? `<span style="color: #10B981; font-weight: 700;">${item.Stock}</span>` : `<span style="color: #9CA3AF;">${item.Stock}</span>`);
 
     return `
       <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-        <td style="font-weight: 700; color: #FFFFFF; padding: 12px 14px;">${item.Name}</td>
-        <td style="padding: 12px 14px;"><span class="badge ${catBadgeClass}">${item.Category}</span></td>
-        <td style="color: #FF334B; font-weight: 700; padding: 12px 14px;">${formatVND(item.Price)}</td>
-        <td style="color: #9CA3AF; padding: 12px 14px; font-size: 13px;">${stockDisplay}</td>
-        <td style="text-align: center; padding: 12px 14px;">
-          <button class="btn btn-primary btn-sm" style="font-weight: 700; padding: 6px 14px;" onclick="handleStaffQuickSell('${item.Name}', ${item.Price})">
-            <i class="fa fa-shopping-cart"></i> Bán ngay
-          </button>
+        <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">${item.Name}</td>
+        <td style="padding: 14px 16px;"><span class="badge ${catBadgeClass}">${item.Category}</span></td>
+        <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">${formatVND(item.Price)}</td>
+        <td style="padding: 14px 16px;">${stockDisplay}</td>
+        <td style="text-align: center; padding: 14px 16px;">
+          ${isOutOfStock ? `
+            <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.5; cursor: not-allowed; font-weight: 600;">
+              <i class="fa fa-ban"></i> Hết hàng
+            </button>
+          ` : `
+            <button class="btn btn-primary btn-sm" style="font-weight: 700; padding: 6px 14px;" onclick="handleStaffQuickSell(${item.ID})">
+              <i class="fa fa-shopping-cart"></i> Bán ngay
+            </button>
+          `}
         </td>
       </tr>
     `;
@@ -333,22 +328,49 @@ function filterStaffPos(category, event) {
 let currentShiftRevenue = 2850000;
 let currentShiftOrders = 8;
 
-async function handleStaffQuickSell(itemName, price) {
+async function handleStaffQuickSell(itemId) {
+  const items = await GymAPI.getInventory();
+  const item = items.find(i => i.ID === Number(itemId));
+  if (!item) {
+    showToast('Không tìm thấy sản phẩm trong kho', 'error');
+    return;
+  }
+
+  if (item.Stock !== undefined && item.Stock <= 0) {
+    showToast(`Mặt hàng "${item.Name}" đã hết trong kho, không thể bán!`, 'error');
+    return;
+  }
+
+  // Trừ số lượng tồn kho nếu sản phẩm có quản lý số lượng
+  if (item.Stock !== undefined && item.Stock > 0) {
+    item.Stock -= 1;
+    if (item.Stock <= 0) {
+      item.Stock = 0;
+      item.Status = 'Hết hàng';
+    }
+    await GymAPI.updateInventoryItem(item);
+  }
+
+  // Tạo phiếu thu tiền bán lẻ
   await GymAPI.addPayment({
-    MemberName: 'Khách mua tại quầy (Khách vãng lai)',
-    PackageName: itemName,
-    Amount: price,
+    MemberName: 'Khách mua tại quầy',
+    PackageName: item.Name,
+    Amount: item.Price,
     PaymentMethod: 'Tiền mặt'
   });
 
-  currentShiftRevenue += Number(price);
+  currentShiftRevenue += Number(item.Price);
   currentShiftOrders += 1;
 
   const revEl = document.getElementById('staffShiftRevenue');
   if (revEl) revEl.textContent = formatVND(currentShiftRevenue);
 
-  showToast(`Đã thanh toán thành công: ${itemName} (${formatVND(price)})!`, 'success');
+  const stockRemainInfo = typeof item.Stock === 'number' ? ` (Còn lại: ${item.Stock})` : '';
+  showToast(`Đã bán 1 ${item.Name} - ${formatVND(item.Price)}${stockRemainInfo}`, 'success');
+
+  loadStaffPosItems(currentStaffPosCategory);
 }
+
 
 
 async function loadStaffRecentAttendees() {
