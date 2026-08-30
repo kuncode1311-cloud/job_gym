@@ -44,9 +44,9 @@ function renderSharedHeader() {
           <option value="Admin" ${currentUser.Role === 'Admin' ? 'selected' : ''}>Admin (Quản lý)</option>
           <option value="Staff" ${currentUser.Role === 'Staff' ? 'selected' : ''}>Staff (Nhân viên)</option>
           <option value="Trainer" ${currentUser.Role === 'Trainer' ? 'selected' : ''}>Trainer (HLV)</option>
-          <option value="Member" ${currentUser.Role === 'Member' ? 'selected' : ''}>Member (Hội viên)</option>
         </select>
       </div>
+
 
       <div class="user-profile-widget">
         <div class="user-avatar">${initials}</div>
@@ -169,11 +169,8 @@ function switchUserRole(role) {
   const roleMap = {
     Admin: { UserID: 1, Username: 'admin', Fullname: 'Văn Điền', Role: 'Admin', RoleTitle: 'Quản lý phòng tập' },
     Staff: { UserID: 8, Username: 'vancuong_staff', Fullname: 'Lâm Văn Cường', Role: 'Staff', RoleTitle: 'Nhân viên hỗ trợ', Email: 'vancuong@gmail.com', Phone: '0901111222' },
-    Trainer: { UserID: 3, Username: 'trainer01', Fullname: 'Trần Quốc Bảo', Role: 'Trainer', RoleTitle: 'Huấn luyện viên' },
-    Member: { UserID: 5, Username: 'member01', Fullname: 'Nguyễn Văn An', Role: 'Member', RoleTitle: 'Hội viên' }
+    Trainer: { UserID: 3, Username: 'trainer01', Fullname: 'Trần Quốc Bảo', Role: 'Trainer', RoleTitle: 'Huấn luyện viên' }
   };
-
-
 
   const newUser = roleMap[role] || roleMap.Admin;
   GymAPI.setCurrentUser(newUser);
@@ -201,7 +198,6 @@ function initSidebarNavigation() {
     menuItems = [
       { name: 'Dashboard', link: 'dashboard.html', icon: 'fa-chart-pie' },
       { name: 'Quản lý tài khoản', link: 'admin.html#users', icon: 'fa-users-cog' },
-      { name: 'Quản lý hội viên', link: 'member.html', icon: 'fa-user-friends' },
       { name: 'Quản lý Trainer', link: 'trainer.html', icon: 'fa-dumbbell' },
       { name: 'Quản lý gói tập', link: 'admin.html#packages', icon: 'fa-box-open' },
       { name: 'Quản lý thanh toán', link: 'admin.html#payments', icon: 'fa-file-invoice-dollar' },
@@ -209,44 +205,37 @@ function initSidebarNavigation() {
       { name: 'Quản lý chấm công', link: 'admin.html#attendance_manage', icon: 'fa-calendar-check' },
       { name: 'Quản lý lương', link: 'admin.html#salaries', icon: 'fa-money-bill-wave' },
       { name: 'Quản lý Booking', link: 'trainer.html#bookings', icon: 'fa-calendar-alt' },
-      { name: 'Feedback', link: 'trainer.html#feedbacks', icon: 'fa-star' },
-      { name: 'Workout Plan', link: 'member.html#workout_plans', icon: 'fa-running' },
-      { name: 'Progress', link: 'member.html#progress', icon: 'fa-chart-line' },
+      { name: 'Feedback & Đánh giá', link: 'trainer.html#feedbacks', icon: 'fa-star' },
       { name: 'Báo cáo', link: 'admin.html#reports', icon: 'fa-chart-bar' }
     ];
   } else if (currentUser.Role === 'Staff') {
     menuItems = [
       { name: 'Bán hàng', link: 'dashboard.html', icon: 'fa-cash-register' },
-      { name: 'Hội viên', link: 'member.html', icon: 'fa-user-friends' },
       { name: 'Thanh toán', link: 'admin.html#payments', icon: 'fa-file-invoice-dollar' },
-      { name: 'Kho', link: 'admin.html#inventory', icon: 'fa-boxes' },
-      { name: 'Điểm danh', link: 'member.html#attendance', icon: 'fa-id-card' },
+      { name: 'Kho hàng', link: 'admin.html#inventory', icon: 'fa-boxes' },
+      { name: 'Điểm danh', link: 'admin.html#attendance_manage', icon: 'fa-calendar-check' },
       { name: 'Booking', link: 'trainer.html#bookings', icon: 'fa-calendar-alt' },
+      { name: 'Feedback từ Khách', link: 'trainer.html#feedbacks', icon: 'fa-star' },
       { name: 'Lương cá nhân', link: 'admin.html#my_salary', icon: 'fa-wallet' }
     ];
-
   } else if (currentUser.Role === 'Trainer') {
     menuItems = [
       { name: 'Dashboard', link: 'dashboard.html', icon: 'fa-home' },
-      { name: 'Hội viên phụ trách', link: 'trainer.html#my_students', icon: 'fa-user-check' },
+      { name: 'Học viên kèm PT', link: 'trainer.html#my_students', icon: 'fa-user-check' },
       { name: 'Booking', link: 'trainer.html#bookings', icon: 'fa-calendar-alt' },
       { name: 'Buổi kèm', link: 'trainer.html#sessions', icon: 'fa-dumbbell' },
-      { name: 'Workout Plan', link: 'member.html#workout_plans', icon: 'fa-clipboard-list' },
-      { name: 'Progress', link: 'member.html#progress', icon: 'fa-heartbeat' },
+      { name: 'Feedback từ Hội viên', link: 'trainer.html#feedbacks', icon: 'fa-star' },
       { name: 'Chấm công', link: 'admin.html#my_attendance', icon: 'fa-clock' },
       { name: 'Thu nhập', link: 'admin.html#my_salary', icon: 'fa-coins' }
     ];
   } else {
-    // Role Member
+    // Default fallback
     menuItems = [
       { name: 'Dashboard', link: 'dashboard.html', icon: 'fa-home' },
-      { name: 'Gói tập của tôi', link: 'member.html#my_package', icon: 'fa-box' },
-      { name: 'Đặt lịch với PT', link: 'trainer.html#book_pt', icon: 'fa-calendar-plus' },
-      { name: 'Giáo án tập', link: 'member.html#workout_plans', icon: 'fa-running' },
-      { name: 'Tiến độ InBody', link: 'member.html#progress', icon: 'fa-chart-line' },
-      { name: 'Lịch sử điểm danh', link: 'member.html#attendance', icon: 'fa-history' }
+      { name: 'Bán hàng', link: 'dashboard.html', icon: 'fa-cash-register' }
     ];
   }
+
 
   // Render HTML danh sách menu
   const currentHash = window.location.hash || '';

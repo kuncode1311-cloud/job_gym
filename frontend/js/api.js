@@ -534,8 +534,30 @@ const GymAPI = {
       return feedbacks.filter(f => f.TrainerID === Number(trainerId));
     }
     return feedbacks;
+  },
+
+  /**
+   * Thêm nhận xét / đánh giá mới từ hội viên
+   */
+  async addFeedback(feedbackData) {
+    const db = MockDB.getDB();
+    if (!db.feedbacks) db.feedbacks = [...DEFAULT_DATABASE.feedbacks];
+    const newId = db.feedbacks.length > 0 ? Math.max(...db.feedbacks.map(f => f.FeedbackID || 0)) + 1 : 1;
+    const newFeedback = {
+      FeedbackID: newId,
+      TrainerID: Number(feedbackData.TrainerID) || 1,
+      TrainerName: feedbackData.TrainerName || 'Nguyễn Minh Tuấn',
+      MemberName: feedbackData.MemberName || 'Hội viên ẩn danh',
+      Rating: Number(feedbackData.Rating) || 5,
+      Comment: feedbackData.Comment || '',
+      FeedbackDate: feedbackData.FeedbackDate || new Date().toISOString().split('T')[0]
+    };
+    db.feedbacks.unshift(newFeedback);
+    MockDB.saveDB(db);
+    return { success: true, data: newFeedback };
   }
 };
+
 
 
 // Đưa đối tượng GymAPI ra phạm vi toàn cục (Global window)

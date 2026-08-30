@@ -588,11 +588,11 @@
           <div class="card-header-flex" style="margin-bottom: 20px; gap: 16px; flex-wrap: wrap;">
             <div class="filter-tabs" id="userRoleFilterTabs">
               <button class="tab-btn active" onclick="filterUserRole('all', event)">Tất cả</button>
-              <button class="tab-btn" onclick="filterUserRole('Admin', event)">Admin</button>
-              <button class="tab-btn" onclick="filterUserRole('Staff', event)">Staff</button>
-              <button class="tab-btn" onclick="filterUserRole('Trainer', event)">Trainer</button>
-              <button class="tab-btn" onclick="filterUserRole('Member', event)">Hội viên</button>
+              <button class="tab-btn" onclick="filterUserRole('Admin', event)">Admin (Quản lý)</button>
+              <button class="tab-btn" onclick="filterUserRole('Staff', event)">Staff (Lễ tân/Nhân viên)</button>
+              <button class="tab-btn" onclick="filterUserRole('Trainer', event)">Trainer (HLV)</button>
             </div>
+
 
             <div class="search-box" style="max-width: 320px;">
               <i class="fa fa-search" style="color: var(--text-dim);"></i>
@@ -921,10 +921,9 @@
           <div class="form-group">
             <label class="form-label">Quyền hệ thống (Role) *</label>
             <select id="usrRole" class="form-control">
-              <option value="Staff">Staff (Nhân viên)</option>
-              <option value="Trainer">Trainer (HLV)</option>
-              <option value="Admin">Admin (Quản lý)</option>
-              <option value="Member">Member (Hội viên)</option>
+              <option value="Staff">Staff (Lễ tân / Nhân viên)</option>
+              <option value="Trainer">Trainer (Huấn luyện viên)</option>
+              <option value="Admin">Admin (Quản lý cấp cao)</option>
             </select>
           </div>
           <div class="form-group">
@@ -935,6 +934,7 @@
             </select>
           </div>
         </div>
+
 
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
           <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Hủy</button>

@@ -120,5 +120,82 @@ function fillDemoAccount(username, password = '123456') {
   }
 }
 
+/**
+ * Mở modal gửi đánh giá góp ý công khai cho hội viên (không cần đăng nhập)
+ */
+function openPublicFeedbackModal() {
+  const modal = document.getElementById('publicFeedbackModal');
+  if (!modal) return;
+  const form = document.getElementById('publicFeedbackForm');
+  if (form) form.reset();
+  setFeedbackRating(5);
+  openModal('publicFeedbackModal');
+}
+
+/**
+ * Đặt mức điểm đánh giá sao (1-5 sao)
+ */
+function setFeedbackRating(rating) {
+  const ratingInput = document.getElementById('fbRatingVal');
+  if (ratingInput) ratingInput.value = rating;
+
+  const stars = document.querySelectorAll('#fbStarRating .star-btn');
+  stars.forEach((star, index) => {
+    if (index < rating) {
+      star.classList.add('active');
+    } else {
+      star.classList.remove('active');
+    }
+  });
+
+  const ratingText = document.getElementById('ratingText');
+  if (ratingText) {
+    const labels = {
+      1: '1/5 Kém ⭐',
+      2: '2/5 Tạm được ⭐⭐',
+      3: '3/5 Khá ⭐⭐⭐',
+      4: '4/5 Tốt ⭐⭐⭐⭐',
+      5: '5/5 Tuyệt vời ⭐⭐⭐⭐⭐'
+    };
+    ratingText.textContent = labels[rating] || `${rating}/5 ⭐`;
+  }
+}
+
+/**
+ * Xử lý khi hội viên gửi đánh giá / feedback
+ */
+async function handlePublicFeedbackSubmit(e) {
+  e.preventDefault();
+  const memberName = document.getElementById('fbMemberName').value.trim();
+  const trainerSelect = document.getElementById('fbTrainerSelect');
+  const trainerId = Number(trainerSelect.value);
+  const trainerText = trainerSelect.options[trainerSelect.selectedIndex].text;
+  const rating = Number(document.getElementById('fbRatingVal').value) || 5;
+  const comment = document.getElementById('fbComment').value.trim();
+
+  if (!memberName || !comment) {
+    showToast('Vui lòng nhập Họ tên và Nội dung đánh giá', 'error');
+    return;
+  }
+
+  const feedbackData = {
+    MemberName: memberName,
+    TrainerID: trainerId === 0 ? 1 : trainerId,
+    TrainerName: trainerId === 0 ? 'Toàn bộ Phòng tập & Cơ sở vật chất' : trainerText.replace('🏋️ HLV ', '').split(' (')[0],
+    Rating: rating,
+    Comment: comment,
+    FeedbackDate: new Date().toISOString().split('T')[0]
+  };
+
+  await GymAPI.addFeedback(feedbackData);
+
+  showToast(`Cảm ơn bạn ${memberName} đã gửi đánh giá & góp ý quý báu!`, 'success');
+  closeModal('publicFeedbackModal');
+}
+
 // Xuất hàm ra global
 window.fillDemoAccount = fillDemoAccount;
+window.openPublicFeedbackModal = openPublicFeedbackModal;
+window.setFeedbackRating = setFeedbackRating;
+window.handlePublicFeedbackSubmit = handlePublicFeedbackSubmit;
+

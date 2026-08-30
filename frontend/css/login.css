@@ -212,6 +212,53 @@
   color: #FFFFFF;
 }
 
+/* Nút Gửi Feedback công khai tại màn hình Login */
+.btn-public-feedback {
+  background: rgba(255, 51, 75, 0.15);
+  border: 1px solid rgba(255, 51, 75, 0.45);
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 9px 22px;
+  border-radius: 20px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(255, 51, 75, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-public-feedback:hover {
+  background: linear-gradient(135deg, #FF334B 0%, #D91B33 100%);
+  border-color: #FF334B;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 51, 75, 0.45);
+}
+
+/* Star Rating Widget */
+.star-rating-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.star-btn {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.star-btn:hover,
+.star-btn.active {
+  color: #F59E0B;
+  transform: scale(1.15);
+}
+
 /* Responsive cho Mobile/Tablet */
 @media (max-width: 900px) {
   .figma-login-wrapper {
@@ -227,4 +274,5 @@
     align-self: center;
   }
 }
+
 

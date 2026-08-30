@@ -53,16 +53,75 @@
           ĐĂNG NHẬP
         </button>
 
+        <!-- Nút Góp ý / Feedback cho Hội viên (Không cần đăng nhập) -->
+        <div style="margin-top: 10px; text-align: center;">
+          <button type="button" class="btn-public-feedback" onclick="openPublicFeedbackModal()">
+            <i class="fa fa-comment-dots" style="color: #FF334B;"></i> Đánh giá &amp; Góp ý cho chúng tôi (Feedback)
+          </button>
+        </div>
+
         <!-- Thanh chọn nhanh tài khoản mẫu để chấm bài / demo -->
         <div class="figma-demo-bar">
           <span style="font-size: 12px; color: #9CA3AF; width: 100%; text-align: center; margin-bottom: 4px;">⚡ Tài khoản mẫu test nhanh:</span>
           <button type="button" class="demo-chip" onclick="fillDemoAccount('admin')">👑 Admin (Quản lý)</button>
           <button type="button" class="demo-chip" onclick="fillDemoAccount('staff01')">👤 Staff (Lễ tân)</button>
           <button type="button" class="demo-chip" onclick="fillDemoAccount('trainer01')">🏋️ Trainer (HLV)</button>
-          <button type="button" class="demo-chip" onclick="fillDemoAccount('member01')">💪 Member (Hội viên)</button>
         </div>
       </form>
     </div>
+
+    <!-- Public Feedback Modal (Hội viên gửi phản hồi không cần đăng nhập) -->
+    <div id="publicFeedbackModal" class="modal-overlay">
+      <div class="modal-content" style="max-width: 520px;">
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title" style="margin: 0;"><i class="fa fa-comment-dots text-red"></i> Đánh Giá &amp; Góp Ý Dịch Vụ</h3>
+            <p style="font-size: 12.5px; color: #9CA3AF; margin: 4px 0 0 0;">Ý kiến của bạn giúp chúng tôi nâng cao chất lượng phòng tập!</p>
+          </div>
+          <button class="btn-close-modal" onclick="closeModal('publicFeedbackModal')">&times;</button>
+        </div>
+
+        <form id="publicFeedbackForm" onsubmit="handlePublicFeedbackSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">Họ và tên của bạn *</label>
+            <input type="text" id="fbMemberName" class="form-control" placeholder="VD: Nguyễn Văn An, Trần Thị Bình..." required style="font-weight: 700;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Đối tượng / Huấn luyện viên (PT) cần đánh giá *</label>
+            <select id="fbTrainerSelect" class="form-control" required>
+              <option value="0">⭐ Đánh giá chung chất lượng Phòng tập &amp; Cơ sở vật chất</option>
+              <option value="1">🏋️ HLV Nguyễn Minh Tuấn (Chuyên môn: Tăng cơ giảm mỡ)</option>
+              <option value="2">🏋️ HLV Trần Quốc Hùng (Chuyên môn: Bodybuilding)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mức độ hài lòng *</label>
+            <div class="star-rating-box" id="fbStarRating">
+              <span class="star-btn active" data-rating="1" onclick="setFeedbackRating(1)"><i class="fa fa-star"></i></span>
+              <span class="star-btn active" data-rating="2" onclick="setFeedbackRating(2)"><i class="fa fa-star"></i></span>
+              <span class="star-btn active" data-rating="3" onclick="setFeedbackRating(3)"><i class="fa fa-star"></i></span>
+              <span class="star-btn active" data-rating="4" onclick="setFeedbackRating(4)"><i class="fa fa-star"></i></span>
+              <span class="star-btn active" data-rating="5" onclick="setFeedbackRating(5)"><i class="fa fa-star"></i></span>
+              <span id="ratingText" style="font-size: 13px; font-weight: 700; color: #F59E0B; margin-left: 10px;">5/5 Tuyệt vời ⭐</span>
+            </div>
+            <input type="hidden" id="fbRatingVal" value="5">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nội dung đánh giá &amp; Góp ý chi tiết *</label>
+            <textarea id="fbComment" class="form-control" rows="4" placeholder="VD: Phòng tập sạch sẽ, máy móc hiện đại và Huấn luyện viên hướng dẫn rất nhiệt tình..." required></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('publicFeedbackModal')">Hủy</button>
+            <button type="submit" class="btn btn-primary" style="padding: 10px 24px; font-weight: 700;"><i class="fa fa-paper-plane"></i> Gửi Đánh Giá</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
 
     <!-- Vùng chân trang: Thông tin liên hệ góc trái & Khẩu hiệu đỏ góc phải -->
     <div class="figma-footer-row">
