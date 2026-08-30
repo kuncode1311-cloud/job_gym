@@ -324,8 +324,8 @@
             <div class="glass-card" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 8px;">
               <div style="font-size: 13px; color: #9CA3AF; font-weight: 500;">Tổng quỹ lương chi trả</div>
               <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <span style="font-size: 26px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.5px;">184.600.000đ</span>
-                <span style="font-size: 13px; font-weight: 700; color: #10B981;">Đã duyệt duyệt chi</span>
+                <span id="totalSalaryFundDisplay" style="font-size: 26px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.5px;">184.600.000đ</span>
+                <span style="font-size: 13px; font-weight: 700; color: #10B981;">Đã duyệt chi</span>
               </div>
             </div>
 
@@ -333,7 +333,7 @@
             <div class="glass-card" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 8px;">
               <div style="font-size: 13px; color: #9CA3AF; font-weight: 500;">Tổng số nhân sự nhận lương</div>
               <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <span style="font-size: 26px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.5px;">18 nhân sự</span>
+                <span id="totalSalaryStaffDisplay" style="font-size: 26px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.5px;">18 nhân sự</span>
                 <span style="font-size: 13px; color: #9CA3AF;">Đầy đủ thông tin</span>
               </div>
             </div>
@@ -346,14 +346,14 @@
                 <thead>
                   <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.12);">
                     <th style="color: #FF334B; font-weight: 700;">Mã NV</th>
-                    <th style="color: #FF334B; font-weight: 700;">Họ tên</th>
+                    <th style="color: #FF334B; font-weight: 700; min-width: 150px;">Họ tên</th>
                     <th style="color: #FF334B; font-weight: 700;">Vai trò</th>
-                    <th style="color: #FF334B; font-weight: 700;">Ngày công</th>
-                    <th style="color: #FF334B; font-weight: 700;">Số buổi PT</th>
-                    <th style="color: #FF334B; font-weight: 700;">Đi trễ</th>
+                    <th style="color: #FF334B; font-weight: 700; text-align: center;">Ngày công</th>
+                    <th style="color: #FF334B; font-weight: 700; text-align: center;">Số buổi PT</th>
+                    <th style="color: #FF334B; font-weight: 700; text-align: center;">Đi trễ</th>
                     <th style="color: #FF334B; font-weight: 700;">Lương cơ bản</th>
-                    <th style="color: #FF334B; font-weight: 700;">Phụ cấp (PT)</th>
-                    <th style="color: #FF334B; font-weight: 700; text-align: center;">Thao tác</th>
+                    <th style="color: #FF334B; font-weight: 700;">Phụ cấp / Thưởng</th>
+                    <th style="color: #FF334B; font-weight: 700; text-align: center; min-width: 180px;">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="salaryTableBody">
@@ -363,6 +363,7 @@
             </div>
           </div>
         </section>
+
 
         <!-- ================= TAB: MY SALARY / TRAINER INCOME (CHUẨN FIGMA) ================= -->
         <section id="section_my_salary" class="tab-section" style="display: none;">
@@ -973,9 +974,12 @@
 
   <!-- Salary Detail & Edit Modal -->
   <div id="salaryModal" class="modal-overlay">
-    <div class="modal-content" style="max-width: 580px;">
+    <div class="modal-content" style="max-width: 620px;">
       <div class="modal-header">
-        <h3 class="modal-title" id="salaryModalTitle"><i class="fa fa-file-invoice-dollar text-yellow"></i> Phiếu Lương Chi Tiết</h3>
+        <div>
+          <h3 class="modal-title" id="salaryModalTitle" style="margin: 0;"><i class="fa fa-edit text-red"></i> Điều Chỉnh Lương &amp; Thù Lao</h3>
+          <p id="salaryModalSubtitle" style="font-size: 12.5px; color: #9CA3AF; margin: 4px 0 0 0;">Chủ phòng tập có thể trực tiếp tăng hoặc giảm lương, thưởng, phụ cấp, phạt</p>
+        </div>
         <button class="btn-close-modal" onclick="closeModal('salaryModal')">&times;</button>
       </div>
 
@@ -1004,29 +1008,52 @@
             <input type="text" id="salWorkDays" class="form-control" placeholder="26/26" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Số buổi PT *</label>
+            <label class="form-label">Số buổi PT đã dạy</label>
             <input type="number" id="salSessions" class="form-control" min="0" value="0" oninput="calculateTotalSalary()">
           </div>
           <div class="form-group">
-            <label class="form-label">Số lần đi trễ *</label>
+            <label class="form-label">Số lần đi trễ</label>
             <input type="number" id="salLateDays" class="form-control" min="0" value="0">
           </div>
         </div>
 
+        <!-- Base Salary & Allowance -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
           <div class="form-group">
             <label class="form-label">Lương cơ bản (VNĐ) *</label>
-            <input type="number" id="salBaseSalary" class="form-control" min="0" step="100000" required oninput="calculateTotalSalary()">
+            <input type="number" id="salBaseSalary" class="form-control" min="0" step="50000" required oninput="calculateTotalSalary()" style="font-weight: 700;">
           </div>
           <div class="form-group">
-            <label class="form-label">Phụ cấp & Thù lao PT (VNĐ) *</label>
-            <input type="number" id="salAllowance" class="form-control" min="0" step="50000" required oninput="calculateTotalSalary()">
+            <label class="form-label">Phụ cấp &amp; Hoa hồng PT (VNĐ)</label>
+            <input type="number" id="salAllowance" class="form-control" min="0" step="50000" oninput="calculateTotalSalary()">
           </div>
         </div>
 
-        <div style="background: rgba(255, 51, 75, 0.08); border: 1px solid rgba(255, 51, 75, 0.25); border-radius: 12px; padding: 14px 18px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-weight: 700; color: #FFFFFF; font-size: 14.5px;">Tổng thu nhập thực nhận:</span>
-          <span id="salTotalDisplay" style="font-size: 20px; font-weight: 800; color: #FF334B;">0đ</span>
+        <!-- Bonus & Deductions (Tăng / Giảm lương) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label" style="color: #10B981;">➕ Thưởng thêm / Tăng lương (VNĐ)</label>
+            <input type="number" id="salBonus" class="form-control" min="0" step="50000" value="0" placeholder="0" oninput="calculateTotalSalary()" style="border-color: rgba(16, 185, 129, 0.4); color: #10B981; font-weight: 700;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color: #EF4444;">➖ Khấu trừ / Phạt giảm (VNĐ)</label>
+            <input type="number" id="salDeduction" class="form-control" min="0" step="50000" value="0" placeholder="0" oninput="calculateTotalSalary()" style="border-color: rgba(239, 68, 68, 0.4); color: #EF4444; font-weight: 700;">
+          </div>
+        </div>
+
+        <!-- Note -->
+        <div class="form-group">
+          <label class="form-label">Ghi chú điều chỉnh của Admin (Lý do tăng/giảm)</label>
+          <input type="text" id="salNote" class="form-control" placeholder="VD: Thưởng vượt KPI doanh số tháng, tăng phụ cấp ca đêm...">
+        </div>
+
+        <!-- Calculation Box -->
+        <div style="background: rgba(255, 51, 75, 0.08); border: 1px solid rgba(255, 51, 75, 0.35); border-radius: 12px; padding: 14px 20px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; color: #FFFFFF; font-size: 14.5px;">Tổng thu nhập thực nhận:</div>
+            <div style="font-size: 11.5px; color: #9CA3AF; margin-top: 2px;">= (Lương cơ bản + Phụ cấp + Thưởng) - Khấu trừ</div>
+          </div>
+          <span id="salTotalDisplay" style="font-size: 22px; font-weight: 800; color: #FF334B; text-shadow: 0 0 12px rgba(255, 51, 75, 0.5);">0đ</span>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 24px;">
@@ -1035,12 +1062,13 @@
           </button>
           <div style="display: flex; gap: 10px;">
             <button type="button" class="btn btn-secondary" onclick="closeModal('salaryModal')">Đóng</button>
-            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Lưu cập nhật</button>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Lưu cập nhật lương</button>
           </div>
         </div>
       </form>
     </div>
   </div>
+
 
   <!-- Scripts -->
 

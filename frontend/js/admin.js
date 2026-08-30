@@ -608,36 +608,69 @@ function openStaffCheckInModal() {
 // 5. BẢNG CHẤM CÔNG & QUẢN LÝ LƯƠNG (SALARIES)
 // ==============================================================================
 
+
 async function loadSalaries() {
   const tableBody = document.getElementById('salaryTableBody');
   if (!tableBody) return;
 
   const salaries = await GymAPI.getSalaries();
-  tableBody.innerHTML = salaries.map(s => `
-    <tr>
-      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 18px;">${s.Code || `NV${s.ID}`}</td>
-      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 18px;">${s.Name}</td>
-      <td style="color: #E5E7EB; padding: 14px 18px;">${s.Role}</td>
-      <td style="color: #FFFFFF; padding: 14px 18px;">${s.WorkDays || '26/26'}</td>
-      <td style="color: #FFFFFF; padding: 14px 18px;">${s.Sessions !== undefined && s.Sessions > 0 ? `${s.Sessions} buổi` : '—'}</td>
-      <td style="padding: 14px 18px;">
-        <span style="font-weight: 700; color: ${s.LateDays === 0 ? '#10B981' : s.LateDays <= 2 ? '#F59E0B' : '#EF4444'};">
-          ${s.LateDays || 0}
-        </span>
-      </td>
-      <td style="color: #FFFFFF; padding: 14px 18px;">${formatVND(s.BaseSalary || 8000000)}</td>
-      <td style="color: #FFFFFF; padding: 14px 18px;">${formatVND(s.Allowance || 0)}</td>
-      <td style="text-align: center; padding: 14px 18px;">
-        <button class="btn btn-secondary btn-sm" style="border-radius: 12px; padding: 4px 16px; font-size: 13px;" onclick="openSalaryDetailModal(${s.ID})">
-          <i class="fa fa-file-invoice-dollar" style="color: #F59E0B; margin-right: 4px;"></i> Chi tiết
-        </button>
-      </td>
-    </tr>
-  `).join('');
+
+  // Tính tổng quỹ lương chi trả động
+  const totalFund = salaries.reduce((sum, s) => {
+    const base = Number(s.BaseSalary) || 0;
+    const allow = Number(s.Allowance) || 0;
+    const bonus = Number(s.Bonus) || 0;
+    const deduct = Number(s.Deduction) || 0;
+    const total = s.TotalSalary || (base + allow + bonus - deduct);
+    return sum + total;
+  }, 0);
+
+  const fundEl = document.getElementById('totalSalaryFundDisplay');
+  if (fundEl) fundEl.textContent = formatVND(totalFund);
+
+  const staffCountEl = document.getElementById('totalSalaryStaffDisplay');
+  if (staffCountEl) staffCountEl.textContent = `${salaries.length} nhân sự`;
+
+  tableBody.innerHTML = salaries.map(s => {
+    const base = Number(s.BaseSalary) || 0;
+    const allow = Number(s.Allowance) || 0;
+    const bonus = Number(s.Bonus) || 0;
+    const deduct = Number(s.Deduction) || 0;
+    const total = s.TotalSalary || (base + allow + bonus - deduct);
+
+    return `
+      <tr>
+        <td style="font-weight: 700; color: #FFFFFF; padding: 14px 18px;">${s.Code || `NV${s.ID}`}</td>
+        <td style="font-weight: 700; color: #FFFFFF; padding: 14px 18px;">${s.Name}</td>
+        <td style="color: #E5E7EB; padding: 14px 18px;">${s.Role}</td>
+        <td style="color: #FFFFFF; padding: 14px 18px; text-align: center;">${s.WorkDays || '26/26'}</td>
+        <td style="color: #FFFFFF; padding: 14px 18px; text-align: center;">${s.Sessions !== undefined && s.Sessions > 0 ? `${s.Sessions} buổi` : '—'}</td>
+        <td style="padding: 14px 18px; text-align: center;">
+          <span style="font-weight: 700; color: ${s.LateDays === 0 ? '#10B981' : s.LateDays <= 2 ? '#F59E0B' : '#EF4444'};">
+            ${s.LateDays || 0}
+          </span>
+        </td>
+        <td style="color: #FFFFFF; padding: 14px 18px;">${formatVND(base)}</td>
+        <td style="color: #10B981; font-weight: 700; padding: 14px 18px;">${formatVND(allow + bonus)}</td>
+        <td style="text-align: center; padding: 14px 18px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px;">
+            <button class="btn btn-primary btn-sm" style="border-radius: 8px; padding: 4px 12px; font-size: 12.5px; font-weight: 700;" onclick="openEditSalaryModal(${s.ID})">
+              <i class="fa fa-edit"></i> Sửa lương
+            </button>
+            <button class="btn btn-secondary btn-sm" style="border-radius: 8px; padding: 4px 12px; font-size: 12.5px; font-weight: 600;" onclick="openSalaryDetailModal(${s.ID})">
+              <i class="fa fa-file-invoice-dollar" style="color: #F59E0B;"></i> Chi tiết
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function openAddSalaryModal() {
-  document.getElementById('salaryModalTitle').innerHTML = '<i class="fa fa-plus-circle text-yellow"></i> Thêm Phiếu Lương Nhân Sự Mới';
+  document.getElementById('salaryModalTitle').innerHTML = '<i class="fa fa-plus-circle text-green"></i> Thêm Phiếu Lương Nhân Sự Mới';
+  const subEl = document.getElementById('salaryModalSubtitle');
+  if (subEl) subEl.textContent = 'Thiết lập bảng lương, phụ cấp, thưởng và thù lao cho nhân sự mới';
   document.getElementById('salaryForm').reset();
   document.getElementById('salId').value = '';
   document.getElementById('salCode').value = `NV${Math.floor(Math.random() * 800 + 100)}`;
@@ -649,16 +682,22 @@ function openAddSalaryModal() {
   document.getElementById('salLateDays').value = 0;
   document.getElementById('salBaseSalary').value = 8000000;
   document.getElementById('salAllowance').value = 0;
+  document.getElementById('salBonus').value = 0;
+  document.getElementById('salDeduction').value = 0;
+  document.getElementById('salNote').value = '';
   calculateTotalSalary();
   openModal('salaryModal');
 }
 
-async function openSalaryDetailModal(id) {
+async function openEditSalaryModal(id) {
   const salaries = await GymAPI.getSalaries();
   const item = salaries.find(s => s.ID === Number(id));
   if (!item) return;
 
-  document.getElementById('salaryModalTitle').innerHTML = '<i class="fa fa-file-invoice-dollar text-yellow"></i> Phiếu Lương Chi Tiết';
+  document.getElementById('salaryModalTitle').innerHTML = `<i class="fa fa-edit text-red"></i> Điều Chỉnh Lương: ${item.Name}`;
+  const subEl = document.getElementById('salaryModalSubtitle');
+  if (subEl) subEl.textContent = 'Chủ phòng tập / Quản lý có thể điều chỉnh tăng hoặc giảm lương cơ bản, thưởng, phạt theo ý muốn';
+
   document.getElementById('salId').value = item.ID;
   document.getElementById('salCode').value = item.Code || `NV${item.ID}`;
   document.getElementById('salName').value = item.Name;
@@ -668,7 +707,36 @@ async function openSalaryDetailModal(id) {
   document.getElementById('salLateDays').value = item.LateDays || 0;
   document.getElementById('salBaseSalary').value = item.BaseSalary || 8000000;
   document.getElementById('salAllowance').value = item.Allowance || 0;
-  
+  document.getElementById('salBonus').value = item.Bonus || 0;
+  document.getElementById('salDeduction').value = item.Deduction || 0;
+  document.getElementById('salNote').value = item.Note || '';
+
+  calculateTotalSalary();
+  openModal('salaryModal');
+}
+
+async function openSalaryDetailModal(id) {
+  const salaries = await GymAPI.getSalaries();
+  const item = salaries.find(s => s.ID === Number(id));
+  if (!item) return;
+
+  document.getElementById('salaryModalTitle').innerHTML = `<i class="fa fa-file-invoice-dollar text-yellow"></i> Phiếu Lương Chi Tiết: ${item.Name}`;
+  const subEl = document.getElementById('salaryModalSubtitle');
+  if (subEl) subEl.textContent = 'Xem chi tiết các khoản lương cơ bản, phụ cấp, thưởng và khấu trừ';
+
+  document.getElementById('salId').value = item.ID;
+  document.getElementById('salCode').value = item.Code || `NV${item.ID}`;
+  document.getElementById('salName').value = item.Name;
+  document.getElementById('salRole').value = item.Role;
+  document.getElementById('salWorkDays').value = item.WorkDays || '26/26';
+  document.getElementById('salSessions').value = item.Sessions || 0;
+  document.getElementById('salLateDays').value = item.LateDays || 0;
+  document.getElementById('salBaseSalary').value = item.BaseSalary || 8000000;
+  document.getElementById('salAllowance').value = item.Allowance || 0;
+  document.getElementById('salBonus').value = item.Bonus || 0;
+  document.getElementById('salDeduction').value = item.Deduction || 0;
+  document.getElementById('salNote').value = item.Note || '';
+
   calculateTotalSalary();
   openModal('salaryModal');
 }
@@ -676,7 +744,9 @@ async function openSalaryDetailModal(id) {
 function calculateTotalSalary() {
   const base = Number(document.getElementById('salBaseSalary').value) || 0;
   const allow = Number(document.getElementById('salAllowance').value) || 0;
-  const total = base + allow;
+  const bonus = Number(document.getElementById('salBonus').value) || 0;
+  const deduct = Number(document.getElementById('salDeduction').value) || 0;
+  const total = Math.max(0, base + allow + bonus - deduct);
   const totalDisplay = document.getElementById('salTotalDisplay');
   if (totalDisplay) {
     totalDisplay.textContent = formatVND(total);
@@ -694,7 +764,10 @@ async function handleSaveSalary(e) {
   const lateDays = Number(document.getElementById('salLateDays').value);
   const baseSalary = Number(document.getElementById('salBaseSalary').value);
   const allowance = Number(document.getElementById('salAllowance').value);
-  const totalSalary = baseSalary + allowance;
+  const bonus = Number(document.getElementById('salBonus').value);
+  const deduction = Number(document.getElementById('salDeduction').value);
+  const note = document.getElementById('salNote').value.trim();
+  const totalSalary = Math.max(0, baseSalary + allowance + bonus - deduction);
 
   const salaryData = {
     Code: code,
@@ -705,21 +778,23 @@ async function handleSaveSalary(e) {
     LateDays: lateDays,
     BaseSalary: baseSalary,
     Allowance: allowance,
+    Bonus: bonus,
+    Deduction: deduction,
+    Note: note,
     TotalSalary: totalSalary
   };
 
   if (id) {
     await GymAPI.updateSalary(id, salaryData);
-    showToast('Cập nhật thông tin bảng lương thành công!', 'success');
+    showToast(`Đã điều chỉnh lương của ${name}: ${formatVND(totalSalary)} thành công!`, 'success');
   } else {
     await GymAPI.addSalary(salaryData);
-    showToast('Thêm phiếu lương nhân sự mới thành công!', 'success');
+    showToast(`Thêm phiếu lương cho ${name} thành công!`, 'success');
   }
 
   closeModal('salaryModal');
   loadSalaries();
 }
-
 
 function printSalarySlip() {
   const name = document.getElementById('salName').value;
@@ -728,9 +803,11 @@ function printSalarySlip() {
   showToast(`Đang in phiếu lương ${code} của nhân sự ${name} (${total})...`, 'success');
 }
 
+window.openEditSalaryModal = openEditSalaryModal;
 
 
 // ==============================================================================
+
 // 6. QUẢN LÝ TÀI KHOẢN HỆ THỐNG (USERS CRUD)
 // ==============================================================================
 
