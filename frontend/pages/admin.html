@@ -110,7 +110,7 @@
                 <button class="tab-btn" onclick="filterInventory('Dịch vụ', event)">Dịch vụ</button>
               </div>
 
-              <button class="btn btn-primary" onclick="openAddInventoryModal()">
+              <button id="addInventoryBtn" class="btn btn-primary" onclick="openAddInventoryModal()">
                 <i class="fa fa-plus"></i> + Thêm mặt hàng
               </button>
             </div>
@@ -124,9 +124,10 @@
                     <th>Đơn giá</th>
                     <th>Tồn kho</th>
                     <th>Trạng thái</th>
-                    <th>Thao tác</th>
+                    <th id="inventoryActionTh">Thao tác</th>
                   </tr>
                 </thead>
+
                 <tbody id="inventoryTableBody">
                   <!-- Populated by admin.js -->
                 </tbody>

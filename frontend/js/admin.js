@@ -407,6 +407,14 @@ async function loadInventory(category = 'all') {
   const tableBody = document.getElementById('inventoryTableBody');
   if (!tableBody) return;
 
+  const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { Role: 'Admin' };
+  const isAdmin = currentUser.Role === 'Admin';
+
+  const addBtn = document.getElementById('addInventoryBtn');
+  const actionTh = document.getElementById('inventoryActionTh');
+  if (addBtn) addBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+  if (actionTh) actionTh.style.display = isAdmin ? 'table-cell' : 'none';
+
   currentInventoryCategory = category;
   let items = await GymAPI.getInventory();
   if (category !== 'all') {
@@ -424,14 +432,17 @@ async function loadInventory(category = 'all') {
           ${i.Status}
         </span>
       </td>
+      ${isAdmin ? `
       <td>
         <button class="btn btn-secondary btn-sm" onclick="openEditInventoryModal(${i.ID})">
           <i class="fa fa-edit"></i> Sửa
         </button>
       </td>
+      ` : ''}
     </tr>
   `).join('');
 }
+
 
 function filterInventory(category, event) {
   document.querySelectorAll('#inventoryTabs .tab-btn').forEach(b => b.classList.remove('active'));
