@@ -428,6 +428,7 @@ async function loadInventory(category = 'all') {
   tableBody.innerHTML = items.map(i => {
     const itemName = i.ProductName || i.Name;
     const itemId = i.ProductID || i.ID;
+    const description = i.Description || 'Chưa có mô tả';
 
     let catBadgeClass = 'badge-blue';
     if (i.Category === 'Clothing') catBadgeClass = 'badge-yellow';
@@ -436,16 +437,18 @@ async function loadInventory(category = 'all') {
 
     return `
       <tr>
+        <td style="font-weight: 700; color: #9CA3AF;">#${itemId}</td>
         <td style="font-weight: 700; color: #FFFFFF;">${itemName}</td>
-        <td><span class="badge ${catBadgeClass}">${i.Category}</span></td>
+        <td style="text-align: center;"><span class="badge ${catBadgeClass}">${i.Category}</span></td>
+        <td style="color: #9CA3AF; font-size: 13px; line-height: 1.4;">${description}</td>
         <td class="price-highlight">${formatVND(i.Price)}</td>
-        <td style="font-weight: 700; color: #E5E7EB;">${i.Stock !== undefined ? i.Stock : 0}</td>
-        <td>
+        <td style="font-weight: 700; color: #E5E7EB; text-align: center;">${i.Stock !== undefined ? i.Stock : 0}</td>
+        <td style="text-align: center;">
           <span class="badge ${i.Stock > 0 ? 'badge-green' : 'badge-red'}">
             ${i.Stock > 0 ? 'Còn hàng' : 'Hết hàng'}
           </span>
         </td>
-        <td>
+        <td style="text-align: center;">
           ${isAdmin ? `
             <button class="btn btn-secondary btn-sm" onclick="openEditInventoryModal(${itemId})" title="Sửa sản phẩm">
               <i class="fa fa-edit"></i> Sửa
@@ -462,7 +465,6 @@ async function loadInventory(category = 'all') {
       </tr>
     `;
   }).join('');
-
 }
 
 function filterInventory(category, event) {
@@ -475,6 +477,7 @@ function openAddInventoryModal() {
   document.getElementById('invModalTitle').textContent = 'Thêm Sản phẩm / Dịch vụ';
   document.getElementById('inventoryForm').reset();
   document.getElementById('invId').value = '';
+  document.getElementById('invDescription').value = '';
   openModal('inventoryModal');
 }
 
@@ -486,6 +489,7 @@ async function openEditInventoryModal(id) {
   document.getElementById('invModalTitle').textContent = 'Chỉnh sửa Sản phẩm / Dịch vụ';
   document.getElementById('invId').value = item.ProductID || item.ID;
   document.getElementById('invName').value = item.ProductName || item.Name;
+  document.getElementById('invDescription').value = item.Description || '';
   document.getElementById('invCategory').value = item.Category;
   document.getElementById('invPrice').value = item.Price;
   document.getElementById('invStock').value = item.Stock !== undefined ? item.Stock : 10;
@@ -511,7 +515,6 @@ async function openStaffStockModal(id) {
   openModal('staffStockModal');
 }
 
-
 async function handleStaffStockIncrement(e) {
   e.preventDefault();
   const id = document.getElementById('staffStockItemId').value;
@@ -533,15 +536,25 @@ async function handleSaveInventory(e) {
   e.preventDefault();
   const id = document.getElementById('invId').value;
   const name = document.getElementById('invName').value.trim();
+  const description = document.getElementById('invDescription').value.trim();
   const category = document.getElementById('invCategory').value;
   const price = Number(document.getElementById('invPrice').value);
   const stock = Number(document.getElementById('invStock').value);
 
-  const itemData = { Name: name, Category: category, Price: price, Stock: stock };
+  const itemData = {
+    ProductName: name,
+    Name: name,
+    Description: description,
+    Category: category,
+    Price: price,
+    Stock: stock
+  };
+
   if (id) {
     itemData.ID = Number(id);
+    itemData.ProductID = Number(id);
     await GymAPI.updateInventoryItem(itemData);
-    showToast('Cập nhật sản phẩm thành công!', 'success');
+    showToast('Cập nhật thông tin sản phẩm thành công!', 'success');
   } else {
     await GymAPI.addInventoryItem(itemData);
     showToast('Thêm sản phẩm mới thành công!', 'success');
@@ -553,6 +566,7 @@ async function handleSaveInventory(e) {
 window.openStaffStockModal = openStaffStockModal;
 window.handleStaffStockIncrement = handleStaffStockIncrement;
 window.handleDeleteInventory = handleDeleteInventory;
+
 
 // ==============================================================================
 // 4. CHẤM CÔNG NHÂN SỰ (ATTENDANCE MANAGE)

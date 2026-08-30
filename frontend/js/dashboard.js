@@ -303,8 +303,12 @@ async function loadStaffPosItems(category = 'all') {
 
     return `
       <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-        <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">${itemName}</td>
+        <td style="padding: 14px 16px;">
+          <div style="font-weight: 700; color: #FFFFFF;">${itemName}</div>
+          <div style="font-size: 12px; color: #9CA3AF; margin-top: 2px;">${item.Description || ''}</div>
+        </td>
         <td style="padding: 14px 16px; text-align: center;"><span class="badge ${catBadgeClass}">${item.Category}</span></td>
+
         <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">${formatVND(item.Price)}</td>
         <td style="padding: 14px 16px; text-align: center;">${stockDisplay}</td>
         <td style="text-align: center; padding: 14px 16px;">
