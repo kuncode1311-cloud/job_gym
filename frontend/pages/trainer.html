@@ -453,11 +453,9 @@
               <div style="background: rgba(255, 51, 75, 0.1); border: 1px solid rgba(255, 51, 75, 0.3); border-radius: 20px; padding: 6px 16px; font-size: 13px; color: #FF334B; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                 <i class="fa fa-database"></i> gym_management.feedbacks
               </div>
-              <button class="btn btn-primary" onclick="openAddFeedbackModal()">
-                <i class="fa fa-pen"></i> + Gửi đánh giá mới
-              </button>
             </div>
           </div>
+
 
           <!-- Table Container (Glass Card) -->
           <div class="glass-card" style="margin-bottom: 24px;">
@@ -618,48 +616,8 @@
     </div>
   </div>
 
-  <!-- Add Feedback Modal -->
-  <div id="feedbackModal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title"><i class="fa fa-star text-yellow"></i> Gửi Đánh giá Huấn luyện viên</h3>
-        <button class="btn-close-modal" onclick="closeModal('feedbackModal')">&times;</button>
-      </div>
-
-      <form id="feedbackForm" onsubmit="handleSaveFeedback(event)">
-        <div class="form-group">
-          <label class="form-label">Chọn HLV cần đánh giá *</label>
-          <select id="fbTrainerSelect" class="form-control" required></select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Tên học viên gửi *</label>
-          <input type="text" id="fbMemberName" class="form-control" placeholder="Nguyễn Văn A..." required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Số sao đánh giá (Rating) *</label>
-          <select id="fbRating" class="form-control">
-            <option value="5">⭐⭐⭐⭐⭐ 5 Sao (Xuất sắc)</option>
-            <option value="4">⭐⭐⭐⭐ 4 Sao (Rất tốt)</option>
-            <option value="3">⭐⭐⭐ 3 Sao (Bình thường)</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Nhận xét chi tiết *</label>
-          <textarea id="fbComment" class="form-control" rows="3" placeholder="Nhận xét về thái độ, kỹ thuật của HLV..." required></textarea>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('feedbackModal')">Hủy</button>
-          <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Gửi đánh giá</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Scripts -->
+
   <script src="../js/mock_data.js"></script>
   <script src="../js/api.js"></script>
   <script src="../js/common.js"></script>
