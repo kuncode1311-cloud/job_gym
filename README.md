@@ -1,46 +1,55 @@
-# 🏋️ HỆ THỐNG QUẢN LÝ PHÒNG TẬP GYM FITNESS - HƯỚNG DẪN TÍCH HỢP BACKEND PHP & XAMPP
+# 🏋️ HỆ THỐNG QUẢN LÝ PHÒNG TẬP GYM & FITNESS
 
-> **Dự án:** Frontend Quản Lý Phòng Tập Gym & Fitness (Chuẩn CSDL MySQL)  
-> **Live Demo:** [https://kuncode1311-cloud.github.io/job_gym/](https://kuncode1311-cloud.github.io/job_gym/)  
-> **File CSDL SQL:** `database/gym_management.sql` (Import trực tiếp vào phpMyAdmin)
+> **Dự án:** Ứng dụng Quản Lý Phòng Tập Gym & Fitness Hiện Đại  
+> **Trải nghiệm trực tiếp (Live Demo):** [https://kuncode1311-cloud.github.io/job_gym/](https://kuncode1311-cloud.github.io/job_gym/)  
+> **File Cơ sở dữ liệu:** `database/gym_management.sql` (Chuẩn MySQL / phpMyAdmin)
 
 ---
 
-## 🚀 1. Hướng Dẫn Kích Hoạt Kết Nối Backend Trong Frontend
+## 🌟 Giới Thiệu Dự Án
 
-Toàn bộ các hàm gọi API trong Frontend đã được tập trung 100% tại file:
-📁 **`frontend/js/api.js`**
+Hệ thống quản lý phòng Gym chuyên nghiệp được xây dựng theo phong cách thiết kế hiện đại (Dark Mode Glow Red), tối ưu trải nghiệm người dùng và chuẩn hóa 100% theo mô hình cơ sở dữ liệu quan hệ.
 
-Khi Backend PHP đã sẵn sàng:
-1. Mở file `frontend/js/api.js`.
-2. Đổi cấu hình ở đầu file sang `true` và trỏ đúng đường dẫn thư mục PHP trong XAMPP:
+Hệ thống hỗ trợ đầy đủ các phân hệ chức năng:
+- 👥 **Quản lý Hội viên:** Đăng ký gói tập, tạo mã VietQR thanh toán tự động, theo dõi hạn tập.
+- 💳 **Quản lý Thanh toán & Hóa đơn:** Thu tiền qua VietQR, Tiền mặt, Thẻ POS, Ví MoMo và in phiếu thu.
+- 🏋️ **Huấn luyện viên (PT):** Quản lý hồ sơ HLV, lịch dạy, học viên kèm và đánh giá sao.
+- 💬 **Đánh giá & Góp ý (Feedback):** Tiếp nhận phản hồi trực tiếp từ khách hàng bên ngoài trang đăng nhập.
+- 📦 **Quản lý Kho & Bán lẻ:** Theo dõi tồn kho Thực phẩm bổ sung (Whey, BCAA), Nước uống, Trang phục, Phụ kiện.
+- 📊 **Báo cáo & Thống kê:** Phân tích doanh thu gói tập, doanh thu bán lẻ F&B, hiệu suất HLV và xuất file Excel (.xls) có màu sắc chuyên nghiệp.
+- ⏰ **Chấm công & Bảng lương:** Điểm danh ca làm việc, tính lương tự động cho nhân viên và HLV.
 
+---
+
+## 🚀 Hướng Dẫn Triển Khai & Kết Nối Hệ Thống
+
+Chỉ với **3 bước đơn giản** để kết nối toàn bộ giao diện với hệ thống Backend:
+
+### 1️⃣ Bước 1: Cài đặt Cơ sở dữ liệu
+- Mở **phpMyAdmin** (trên XAMPP, Laragon hoặc máy chủ MySQL).
+- Tạo cơ sở dữ liệu tên: `gym_management_system`.
+- Nhập (Import) file **`database/gym_management.sql`** có sẵn trong dự án.
+
+### 2️⃣ Bước 2: Cấu hình kết nối API
+- Mở file: **`frontend/js/api.js`**.
+- Đổi cấu hình kết nối sang server Backend của bạn:
 ```javascript
-// frontend/js/api.js
 const GymAPI = {
-  // Đổi thành true để chuyển từ Mock DB sang gọi API PHP thật:
-  USE_REAL_BACKEND: true, 
-
-  // Đường dẫn thư mục Backend trong htdocs của XAMPP:
-  BASE_URL: 'http://localhost/GYM_BE/api', 
+  USE_REAL_BACKEND: true, // Bật chế độ kết nối dữ liệu thật
+  BASE_URL: 'http://localhost/GYM_BE/api', // Đường dẫn thư mục API Backend
   ...
 };
 ```
 
----
-
-## ⚙️ 2. File Header CORS Chuẩn Cho Mọi File PHP
-Khi gọi API từ Frontend sang Backend bằng lệnh `fetch()`, mỗi file PHP cần có cấu hình Header sau ở đầu file để không bị trình duyệt chặn CORS:
-
+### 3️⃣ Bước 3: Cấu hình Header cho Server Backend (Ví dụ PHP)
+Để trình duyệt không bị chặn kết nối, đặt đoạn mã này ở đầu các file xử lý API:
 ```php
 <?php
-// config/cors.php (hoặc đặt ở đầu mọi file API)
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Content-Type: application/json; charset=UTF-8");
 
-// Xử lý Request Preflight OPTIONS của trình duyệt
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -49,64 +58,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 ---
 
-## 🗄️ 3. File Kết Nối Database Chuẩn (`db.php`)
+## 📡 Danh Sách Các API Kết Nối Dữ Liệu
 
-```php
-<?php
-// config/db.php
-$host = "localhost";
-$db_name = "gym_management_system";
-$username = "root";
-$password = ""; // Mặc định XAMPP để trống
+Tất cả các API đều giao tiếp bằng định dạng **JSON**. Dưới đây là danh sách các đường dẫn chính:
 
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    echo json_encode(["success" => false, "message" => "Lỗi kết nối CSDL: " . $e->getMessage()]);
-    exit();
-}
-```
+### 1. Phân hệ Hội viên (`/api/members`)
+- `GET /api/members` : Lấy danh sách toàn bộ hội viên.
+- `POST /api/members` : Thêm mới hội viên (kèm gói tập & hình thức thanh toán).
+- `PUT /api/members/{id}` : Cập nhật thông tin hội viên.
+- `DELETE /api/members/{id}` : Xóa / hủy gói hội viên.
 
----
-
-## 📡 4. Danh Sách Chi Tiết Các API Cần Viết
-
----
-
-### 🟢 Phân Hệ 1: HỘI VIÊN (`members`)
-
-#### 1. Lấy danh sách hội viên
-- **Method:** `GET`
-- **URL:** `/api/members` hoặc `/api/members/get_all.php`
-- **Response mẫu (200 OK):**
-```json
-[
-  {
-    "MemberID": 1,
-    "Code": "HV-1001",
-    "Fullname": "Nguyễn Văn An",
-    "Gender": "Male",
-    "BirthDate": "1995-05-12",
-    "Phone": "0901234567",
-    "Email": "an.nguyen@gmail.com",
-    "Address": "123 Lê Lợi, Q.1",
-    "PackageName": "Gói 12 tháng Diamond",
-    "Price": 4200000,
-    "PaymentStatus": "Paid",
-    "PaymentMethod": "VietQR",
-    "Status": "Active",
-    "JoinDate": "2026-01-15",
-    "EndDate": "2027-01-15"
-  }
-]
-```
-
-#### 2. Thêm mới hội viên (Có chọn phương thức thanh toán)
-- **Method:** `POST`
-- **URL:** `/api/members` hoặc `/api/members/create.php`
-- **Request Body (JSON):**
+*Mẫu dữ liệu gửi khi thêm mới hội viên:*
 ```json
 {
   "Code": "HV-1007",
@@ -125,79 +87,14 @@ try {
   "Status": "Active"
 }
 ```
-- **Code PHP xử lý mẫu (`create.php`):**
-```php
-<?php
-require_once '../config/cors.php';
-require_once '../config/db.php';
-
-// Nhận dữ liệu JSON từ Frontend
-$data = json_decode(file_get_contents("php://input"), true);
-
-if (!empty($data['Fullname']) && !empty($data['Phone'])) {
-    $sql = "INSERT INTO members (Code, Fullname, Gender, BirthDate, Phone, Email, Address, PackageName, Price, JoinDate, EndDate, PaymentMethod, PaymentStatus, Status) 
-            VALUES (:Code, :Fullname, :Gender, :BirthDate, :Phone, :Email, :Address, :PackageName, :Price, :JoinDate, :EndDate, :PaymentMethod, :PaymentStatus, :Status)";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([
-        ':Code' => $data['Code'],
-        ':Fullname' => $data['Fullname'],
-        ':Gender' => $data['Gender'] ?? 'Male',
-        ':BirthDate' => $data['BirthDate'] ?? null,
-        ':Phone' => $data['Phone'],
-        ':Email' => $data['Email'] ?? null,
-        ':Address' => $data['Address'] ?? null,
-        ':PackageName' => $data['PackageName'],
-        ':Price' => $data['Price'],
-        ':JoinDate' => $data['JoinDate'],
-        ':EndDate' => $data['EndDate'],
-        ':PaymentMethod' => $data['PaymentMethod'] ?? 'VietQR',
-        ':PaymentStatus' => $data['PaymentStatus'] ?? 'Paid',
-        ':Status' => $data['Status'] ?? 'Active'
-    ]);
-
-    echo json_encode(["success" => true, "message" => "Thêm hội viên thành công!"]);
-} else {
-    echo json_encode(["success" => false, "message" => "Thiếu thông tin bắt buộc!"]);
-}
-```
-
-#### 3. Cập nhật hội viên
-- **Method:** `PUT` (hoặc `POST`)
-- **URL:** `/api/members/{id}` hoặc `/api/members/update.php?id=1`
-- **Request Body (JSON):** Các trường thông tin cần cập nhật.
-
-#### 4. Xóa / Khóa hội viên
-- **Method:** `DELETE` (hoặc `POST`)
-- **URL:** `/api/members/{id}` hoặc `/api/members/delete.php?id=1`
 
 ---
 
-### 🟢 Phân Hệ 2: THANH TOÁN & HÓA ĐƠN (`payments`)
+### 2. Phân hệ Thanh toán & Hóa đơn (`/api/payments`)
+- `GET /api/payments` : Lấy lịch sử giao dịch thu tiền.
+- `POST /api/payments` : Tạo hóa đơn thu tiền mới.
 
-#### 1. Lấy danh sách hóa đơn
-- **Method:** `GET`
-- **URL:** `/api/payments`
-- **Response mẫu:**
-```json
-[
-  {
-    "PaymentsID": 1,
-    "Code": "INV-20260830-1001",
-    "MemberName": "Nguyễn Văn An",
-    "MemberCode": "HV-1001",
-    "PackageName": "Gói 12 tháng Diamond",
-    "Amount": 4200000,
-    "PaymentMethod": "VietQR",
-    "PaymentDate": "2026-08-30",
-    "Status": "Completed"
-  }
-]
-```
-
-#### 2. Thêm mới giao dịch thu tiền
-- **Method:** `POST`
-- **URL:** `/api/payments`
-- **Request Body:**
+*Mẫu dữ liệu hóa đơn:*
 ```json
 {
   "Code": "INV-20260830-1007",
@@ -213,49 +110,18 @@ if (!empty($data['Fullname']) && !empty($data['Phone'])) {
 
 ---
 
-### 🟢 Phân Hệ 3: HUẤN LUYỆN VIÊN (`trainers`)
-
-#### 1. Lấy danh sách Huấn luyện viên
-- **Method:** `GET`
-- **URL:** `/api/trainers`
-- **Response mẫu:**
-```json
-[
-  {
-    "TrainerID": 1,
-    "Fullname": "Nguyễn Minh Tuấn",
-    "Specialty": "Tăng cơ, Giảm mỡ, Bodybuilding",
-    "Phone": "0903112233",
-    "Experience": "5 năm",
-    "Status": "Active"
-  },
-  {
-    "TrainerID": 2,
-    "Fullname": "Trần Quốc Hùng",
-    "Specialty": "Bodybuilding, Sức mạnh",
-    "Phone": "0908889900",
-    "Experience": "8 năm",
-    "Status": "Active"
-  }
-]
-```
-
-#### 2. Thêm / Cập nhật HLV
-- **Method:** `POST` / `PUT`
-- **URL:** `/api/trainers`
+### 3. Phân hệ Huấn luyện viên (`/api/trainers`)
+- `GET /api/trainers` : Lấy danh sách HLV, chuyên môn và số năm kinh nghiệm.
+- `POST /api/trainers` : Thêm mới hồ sơ HLV.
+- `PUT /api/trainers/{id}` : Chỉnh sửa thông tin HLV.
 
 ---
 
-### 🟢 Phân Hệ 4: ĐÁNH GIÁ & FEEDBACK (`feedbacks`)
+### 4. Phân hệ Đánh giá & Góp ý (`/api/feedbacks`)
+- `GET /api/feedbacks` : Lấy danh sách đánh giá của học viên.
+- `POST /api/feedbacks` : Gửi đánh giá sao & nhận xét mới từ khách hàng.
 
-#### 1. Lấy danh sách Feedback của học viên
-- **Method:** `GET`
-- **URL:** `/api/feedbacks`
-
-#### 2. Học viên gửi đánh giá từ trang Đăng nhập
-- **Method:** `POST`
-- **URL:** `/api/feedbacks`
-- **Request Body (JSON):**
+*Mẫu dữ liệu đánh giá:*
 ```json
 {
   "TrainerID": 1,
@@ -269,83 +135,43 @@ if (!empty($data['Fullname']) && !empty($data['Phone'])) {
 
 ---
 
-### 🟢 Phân Hệ 5: KHO HÀNG & SẢN PHẨM (`inventory`)
-
-#### 1. Lấy danh sách sản phẩm tồn kho
-- **Method:** `GET`
-- **URL:** `/api/inventory`
-- **Response mẫu:**
-```json
-[
-  {
-    "InventoryID": 1,
-    "ItemCode": "SP-101",
-    "ItemName": "Whey Gold Standard 5lbs",
-    "Category": "Supplement",
-    "Quantity": 15,
-    "UnitPrice": 1800000,
-    "Status": "InStock"
-  },
-  {
-    "InventoryID": 2,
-    "ItemCode": "SP-103",
-    "ItemName": "Nước tăng lực Monster Energy",
-    "Category": "Beverage",
-    "Quantity": 80,
-    "UnitPrice": 30000,
-    "Status": "InStock"
-  }
-]
-```
+### 5. Phân hệ Kho hàng & Sản phẩm (`/api/inventory`)
+- `GET /api/inventory` : Lấy danh sách sản phẩm tồn kho (Whey, BCAA, Nước uống...).
+- `POST /api/inventory` : Nhập sản phẩm mới vào kho.
+- `PUT /api/inventory/{id}` : Cập nhật số lượng tồn / đơn giá.
 
 ---
 
-### 🟢 Phân Hệ 6: GÓI TẬP (`packages`)
-
-- **Lấy danh sách:** `GET /api/packages`
-- **Thêm gói tập:** `POST /api/packages`
-- **Sửa gói tập:** `PUT /api/packages/{id}`
-
----
-
-### 🟢 Phân Hệ 7: BẢNG LƯƠNG & CHẤM CÔNG
-
-- **Lấy bảng chấm công:** `GET /api/attendance`
-- **Check-in chấm công:** `POST /api/attendance`
-- **Lấy bảng lương nhân viên:** `GET /api/salaries`
+### 6. Phân hệ Gói tập, Chấm công & Bảng lương
+- `GET /api/packages` : Danh sách các gói tập phòng Gym.
+- `GET /api/attendance` : Lịch sử điểm danh / chấm công nhân viên.
+- `POST /api/attendance` : Check-in ca làm việc.
+- `GET /api/salaries` : Bảng lương & thù lao hàng tháng.
 
 ---
 
-## 🛠️ 5. Cấu Trúc Thư Mục Gợi Ý Phía Backend PHP trong XAMPP
+## 📁 Cấu Trúc Thư Mục Dự Án
 
 ```text
-C:/xampp/htdocs/GYM_BE/
-├── config/
-│   ├── cors.php             # Cấu hình Header CORS
-│   └── db.php               # Kết nối PDO MySQL
-└── api/
-    ├── auth/
-    │   └── login.php        # POST /api/auth/login.php
-    ├── members/
-    │   ├── get_all.php      # GET  /api/members/get_all.php
-    │   ├── create.php       # POST /api/members/create.php
-    │   └── update.php       # POST /api/members/update.php
-    ├── payments/
-    │   ├── get_all.php      # GET  /api/payments/get_all.php
-    │   └── create.php       # POST /api/payments/create.php
-    ├── trainers/
-    │   └── get_all.php      # GET  /api/trainers/get_all.php
-    ├── feedbacks/
-    │   ├── get_all.php      # GET  /api/feedbacks/get_all.php
-    │   └── create.php       # POST /api/feedbacks/create.php
-    └── inventory/
-        └── get_all.php      # GET  /api/inventory/get_all.php
+GYM_FE/
+├── database/
+│   └── gym_management.sql       # File CSDL MySQL hoàn chỉnh
+├── frontend/
+│   ├── assets/images/           # Hình ảnh & logo thương hiệu
+│   ├── css/                     # Toàn bộ mã nguồn giao diện Dark Theme
+│   ├── js/
+│   │   ├── api.js               # Điểm cấu hình & gọi API tập trung
+│   │   ├── common.js            # Header, Menu phân quyền, Thông báo Toast
+│   │   ├── member.js            # Xử lý Hội viên & Popup VietQR
+│   │   ├── trainer.js           # Xử lý HLV & Đánh giá Feedback
+│   │   ├── admin.js             # Báo cáo doanh thu & Xuất Excel
+│   │   └── auth.js              # Đăng nhập & Đăng ký
+│   └── pages/
+│       ├── login.html           # Trang Đăng nhập & Gửi đánh giá công khai
+│       ├── dashboard.html       # Bảng điều khiển tổng quan
+│       ├── member.html          # Quản lý Hội viên & InBody
+│       ├── trainer.html         # Quản lý HLV & Đánh giá chất lượng
+│       └── admin.html           # Quản lý Lương, Kho hàng & Báo cáo
+├── index.html                   # Trang điều hướng tự động
+└── README.md                    # Hướng dẫn dự án & Tích hợp hệ thống
 ```
-
----
-
-## ✅ Tóm Tắt Cho Bạn Backend
-1. Tạo thư mục `GYM_BE` trong `C:\xampp\htdocs\`.
-2. Import file database `database/gym_management.sql` vào phpMyAdmin.
-3. Viết các file PHP trả về dữ liệu định dạng `json_encode($result)`.
-4. Mở `frontend/js/api.js` sửa `USE_REAL_BACKEND: true` và `BASE_URL: 'http://localhost/GYM_BE/api'` là hệ thống chạy mượt 100%!
