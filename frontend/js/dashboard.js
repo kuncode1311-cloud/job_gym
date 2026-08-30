@@ -300,9 +300,9 @@ async function loadStaffPosItems(category = 'all') {
     return `
       <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
         <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">${item.Name}</td>
-        <td style="padding: 14px 16px;"><span class="badge ${catBadgeClass}">${item.Category}</span></td>
+        <td style="padding: 14px 16px; text-align: center;"><span class="badge ${catBadgeClass}">${item.Category}</span></td>
         <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">${formatVND(item.Price)}</td>
-        <td style="padding: 14px 16px;">${stockDisplay}</td>
+        <td style="padding: 14px 16px; text-align: center;">${stockDisplay}</td>
         <td style="text-align: center; padding: 14px 16px;">
           ${isOutOfStock ? `
             <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.5; cursor: not-allowed; font-weight: 600;">
