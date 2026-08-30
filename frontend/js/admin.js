@@ -1024,269 +1024,500 @@ function loadReportsData() {
 }
 
 /**
- * Xuất file Excel (.xls) định dạng màu sắc, viền ô, căn chỉnh độ rộng cột chuẩn không bị che chữ
+ * Xuất file Excel chuẩn Microsoft SpreadsheetML (XML Spreadsheet 2003)
+ * Chuẩn 100% độ rộng cột, không tràn ô, không che chữ, màu sắc và định dạng chuyên nghiệp.
  */
 function exportReportToExcel() {
   const exportTime = new Date().toLocaleString('vi-VN');
-  
-  const excelHtml = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #1F2937; }
-    table { border-collapse: collapse; width: 100%; }
-    .banner-title { background-color: #0F172A; color: #FFFFFF; font-size: 16pt; font-weight: bold; text-align: center; height: 45px; vertical-align: middle; }
-    .banner-sub { background-color: #1E293B; color: #94A3B8; font-size: 10pt; text-align: center; height: 26px; vertical-align: middle; }
-    .section-title { background-color: #FF334B; color: #FFFFFF; font-size: 12pt; font-weight: bold; height: 36px; padding-left: 12px; vertical-align: middle; }
-    .section-title-blue { background-color: #1E40AF; color: #FFFFFF; font-size: 12pt; font-weight: bold; height: 36px; padding-left: 12px; vertical-align: middle; }
-    .th-cell { background-color: #334155; color: #FFFFFF; font-weight: bold; text-align: center; height: 32px; border: 1px solid #64748B; vertical-align: middle; }
-    .td-cell { border: 1px solid #CBD5E1; padding: 8px 12px; height: 28px; vertical-align: middle; }
-    .td-num { border: 1px solid #CBD5E1; padding: 8px 12px; text-align: right; vertical-align: middle; }
-    .td-center { border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; }
-    .row-even { background-color: #F8FAFC; }
-    .row-total { background-color: #FEF2F2; font-weight: bold; color: #DC2626; height: 32px; border: 2px solid #FF334B; }
-    .badge-green { color: #059669; font-weight: bold; }
-    .badge-blue { color: #2563EB; font-weight: bold; }
-    .badge-yellow { color: #D97706; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <table>
-    <colgroup>
-      <col style="width: 100px;">
-      <col style="width: 280px;">
-      <col style="width: 220px;">
-      <col style="width: 160px;">
-      <col style="width: 140px;">
-      <col style="width: 180px;">
-      <col style="width: 140px;">
-    </colgroup>
 
-    <!-- Header Banner -->
-    <tr>
-      <td colspan="7" class="banner-title">HỆ THỐNG PHÒNG TẬP GYM FITNESS - BÁO CÁO DOANH THU TỔNG HỢP</td>
-    </tr>
-    <tr>
-      <td colspan="7" class="banner-sub">Thời gian xuất báo cáo: ${exportTime} • Kỳ thống kê: Tháng 08/2026</td>
-    </tr>
-    <tr><td colspan="7" style="height: 14px;"></td></tr>
+  const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>Fitness Gym Management</Author>
+  <Created>${new Date().toISOString()}</Created>
+  <Company>Fitness Center</Company>
+ </DocumentProperties>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="11" ss:Color="#1F2937"/>
+  </Style>
+  <!-- Main Banner -->
+  <Style ss:ID="sBanner">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="15" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#0F172A" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sSubBanner">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#94A3B8"/>
+   <Interior ss:Color="#1E293B" ss:Pattern="Solid"/>
+  </Style>
+  <!-- Section Headers -->
+  <Style ss:ID="sSecHeaderRed">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="11.5" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#FF334B" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sSecHeaderBlue">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="11.5" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#1E40AF" ss:Pattern="Solid"/>
+  </Style>
+  <!-- Table Header -->
+  <Style ss:ID="sTh">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#64748B"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#64748B"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#64748B"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#64748B"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#334155" ss:Pattern="Solid"/>
+  </Style>
+  <!-- Data Cells -->
+  <Style ss:ID="sTd">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5"/>
+  </Style>
+  <Style ss:ID="sTdBold">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sTdCenter">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5"/>
+  </Style>
+  <Style ss:ID="sTdCenterBold">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1"/>
+  </Style>
+  <!-- Striped Cells (Even rows) -->
+  <Style ss:ID="sTdEven">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5"/>
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sTdEvenBold">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1"/>
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sTdEvenCenter">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5"/>
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+  </Style>
+  <!-- Currencies / Numbers -->
+  <Style ss:ID="sMoneyRed">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1" ss:Color="#DC2626"/>
+  </Style>
+  <Style ss:ID="sMoneyRedEven">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1" ss:Color="#DC2626"/>
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sMoneyBlue">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1" ss:Color="#2563EB"/>
+  </Style>
+  <Style ss:ID="sMoneyGreen">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1" ss:Color="#059669"/>
+  </Style>
+  <Style ss:ID="sMoneyGreenEven">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1" ss:Color="#059669"/>
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+  </Style>
+  <!-- Badges -->
+  <Style ss:ID="sBadgeGreen">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1" ss:Color="#059669"/>
+  </Style>
+  <Style ss:ID="sBadgeYellow">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="10.5" ss:Bold="1" ss:Color="#D97706"/>
+  </Style>
+  <!-- Total Rows -->
+  <Style ss:ID="sTotalRed">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#DC2626"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#DC2626"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DC2626"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DC2626"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="11" ss:Bold="1" ss:Color="#DC2626"/>
+   <Interior ss:Color="#FEF2F2" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sTotalRedMoney">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#DC2626"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#DC2626"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DC2626"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DC2626"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="11.5" ss:Bold="1" ss:Color="#DC2626"/>
+   <Interior ss:Color="#FEF2F2" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sTotalBlue">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#2563EB"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#2563EB"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#2563EB"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#2563EB"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="11" ss:Bold="1" ss:Color="#2563EB"/>
+   <Interior ss:Color="#EFF6FF" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sTotalBlueMoney">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#2563EB"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#2563EB"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#2563EB"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#2563EB"/>
+   </Borders>
+   <Font ss:FontName="Segoe UI" ss:Size="11.5" ss:Bold="1" ss:Color="#2563EB"/>
+   <Interior ss:Color="#EFF6FF" ss:Pattern="Solid"/>
+  </Style>
+  <!-- Signatures -->
+  <Style ss:ID="sSignHead">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Font ss:FontName="Segoe UI" ss:Size="11" ss:Bold="1" ss:Color="#0F172A"/>
+  </Style>
+  <Style ss:ID="sSignSub">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Italic="1" ss:Color="#64748B"/>
+  </Style>
+  <Style ss:ID="sSignName">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="0"/>
+   <Font ss:FontName="Segoe UI" ss:Size="11" ss:Bold="1" ss:Color="#0F172A"/>
+  </Style>
+ </Styles>
 
-    <!-- PHẦN 1: TỔNG QUAN DOANH THU -->
-    <tr>
-      <td colspan="7" class="section-title">1. TỔNG QUAN DOANH THU THÁNG 08/2026</td>
-    </tr>
-    <tr>
-      <th class="th-cell">Mã HM</th>
-      <th class="th-cell" colspan="2">Hạng mục Doanh thu</th>
-      <th class="th-cell">Doanh thu (VNĐ)</th>
-      <th class="th-cell">Tỷ trọng (%)</th>
-      <th class="th-cell">Tăng trưởng</th>
-      <th class="th-cell">Trạng thái</th>
-    </tr>
-    <tr>
-      <td class="td-center">HM-01</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold;">Doanh thu Gói tập Hội viên (Membership)</td>
-      <td class="td-num" style="color: #FF334B; font-weight: bold;">34.800.000 VNĐ</td>
-      <td class="td-center">72.1%</td>
-      <td class="td-center badge-green">+11.5%</td>
-      <td class="td-center badge-green">Đạt chỉ tiêu</td>
-    </tr>
-    <tr class="row-even">
-      <td class="td-center">HM-02</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold; color: #2563EB;">Doanh thu Bán lẻ Sản phẩm (Whey / Nước / Phụ kiện)</td>
-      <td class="td-num" style="color: #2563EB; font-weight: bold;">13.450.000 VNĐ</td>
-      <td class="td-center">27.9%</td>
-      <td class="td-center badge-green">+28.5%</td>
-      <td class="td-center badge-green">Tăng trưởng mạnh</td>
-    </tr>
-    <tr class="row-total">
-      <td class="td-center" style="font-weight: bold;">TỔNG CỘNG</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold;">TỔNG DOANH THU PHÒNG GYM THÁNG 8</td>
-      <td class="td-num" style="font-size: 12pt; color: #DC2626; font-weight: bold;">48.250.000 VNĐ</td>
-      <td class="td-center" style="font-weight: bold;">100.0%</td>
-      <td class="td-center badge-green" style="font-weight: bold;">+14.2%</td>
-      <td class="td-center badge-green" style="font-weight: bold;">Vượt KPI</td>
-    </tr>
+ <Worksheet ss:Name="Báo cáo Doanh thu">
+  <Table ss:DefaultRowHeight="22">
+   <Column ss:Width="85"/>
+   <Column ss:Width="250"/>
+   <Column ss:Width="230"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="175"/>
+   <Column ss:Width="145"/>
 
-    <tr><td colspan="7" style="height: 18px;"></td></tr>
+   <!-- Banner -->
+   <Row ss:Height="36">
+    <Cell ss:MergeAcross="6" ss:StyleID="sBanner"><Data ss:Type="String">HỆ THỐNG PHÒNG TẬP GYM FITNESS - BÁO CÁO DOANH THU TỔNG HỢP</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:MergeAcross="6" ss:StyleID="sSubBanner"><Data ss:Type="String">Thời gian xuất báo cáo: ${exportTime} • Kỳ thống kê: Tháng 08/2026</Data></Cell>
+   </Row>
+   <Row ss:Height="12"><Cell ss:MergeAcross="6"/></Row>
 
-    <!-- PHẦN 2: DOANH THU KINH DOANH SẢN PHẨM -->
-    <tr>
-      <td colspan="7" class="section-title-blue">2. DOANH THU KINH DOANH SẢN PHẨM CHI TIẾT (WHEY, NƯỚC UỐNG, TRANG PHỤC, PHỤ KIỆN)</td>
-    </tr>
-    <tr>
-      <th class="th-cell">Mã SP</th>
-      <th class="th-cell">Tên sản phẩm</th>
-      <th class="th-cell">Danh mục</th>
-      <th class="th-cell">Đơn giá bán</th>
-      <th class="th-cell">Số lượng bán</th>
-      <th class="th-cell">Tổng doanh thu</th>
-      <th class="th-cell">Tỷ trọng SP</th>
-    </tr>
-    <tr>
-      <td class="td-center" style="font-weight: bold; color: #FF334B;">SP-101</td>
-      <td class="td-cell" style="font-weight: bold;">Whey Gold Standard 5lbs</td>
-      <td class="td-cell">Thực phẩm bổ sung (Supplement)</td>
-      <td class="td-num">1.800.000 VNĐ</td>
-      <td class="td-center" style="font-weight: bold;">3 Hộp</td>
-      <td class="td-num" style="color: #FF334B; font-weight: bold;">5.400.000 VNĐ</td>
-      <td class="td-center">40.1%</td>
-    </tr>
-    <tr class="row-even">
-      <td class="td-center" style="font-weight: bold; color: #FF334B;">SP-102</td>
-      <td class="td-cell" style="font-weight: bold;">BCAA 6000 Phục hồi cơ</td>
-      <td class="td-cell">Thực phẩm bổ sung (Supplement)</td>
-      <td class="td-num">850.000 VNĐ</td>
-      <td class="td-center" style="font-weight: bold;">3 Hộp</td>
-      <td class="td-num" style="color: #FF334B; font-weight: bold;">2.550.000 VNĐ</td>
-      <td class="td-center">19.0%</td>
-    </tr>
-    <tr>
-      <td class="td-center" style="font-weight: bold; color: #2563EB;">SP-103</td>
-      <td class="td-cell" style="font-weight: bold;">Nước tăng lực Monster Energy</td>
-      <td class="td-cell">Đồ uống &amp; Năng lượng (Beverage)</td>
-      <td class="td-num">30.000 VNĐ</td>
-      <td class="td-center" style="font-weight: bold;">80 Lon</td>
-      <td class="td-num" style="color: #2563EB; font-weight: bold;">2.400.000 VNĐ</td>
-      <td class="td-center">17.8%</td>
-    </tr>
-    <tr class="row-even">
-      <td class="td-center" style="font-weight: bold; color: #059669;">SP-104</td>
-      <td class="td-cell" style="font-weight: bold;">Áo thun tập gym Gymshark</td>
-      <td class="td-cell">Trang phục thể thao (Clothing)</td>
-      <td class="td-num">250.000 VNĐ</td>
-      <td class="td-center" style="font-weight: bold;">8 Áo</td>
-      <td class="td-num" style="color: #059669; font-weight: bold;">2.000.000 VNĐ</td>
-      <td class="td-center">14.9%</td>
-    </tr>
-    <tr>
-      <td class="td-center" style="font-weight: bold; color: #D97706;">SP-105</td>
-      <td class="td-cell" style="font-weight: bold;">Bình nước Shaker Gym 700ml</td>
-      <td class="td-cell">Phụ kiện tập luyện (Accessory)</td>
-      <td class="td-num">120.000 VNĐ</td>
-      <td class="td-center" style="font-weight: bold;">9 Bình</td>
-      <td class="td-num" style="color: #D97706; font-weight: bold;">1.100.000 VNĐ</td>
-      <td class="td-center">8.2%</td>
-    </tr>
-    <tr class="row-total" style="background-color: #EFF6FF; border: 2px solid #2563EB;">
-      <td class="td-center" style="font-weight: bold; color: #2563EB;">TỔNG SẢN PHẨM</td>
-      <td class="td-cell" colspan="3" style="font-weight: bold; color: #2563EB;">TỔNG DOANH THU KINH DOANH SẢN PHẨM (F&B / WHEY)</td>
-      <td class="td-center" style="font-weight: bold; color: #2563EB;">103 Đơn vị</td>
-      <td class="td-num" style="font-size: 11.5pt; color: #2563EB; font-weight: bold;">13.450.000 VNĐ</td>
-      <td class="td-center" style="font-weight: bold; color: #2563EB;">100.0%</td>
-    </tr>
+   <!-- SECTION 1 -->
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="6" ss:StyleID="sSecHeaderRed"><Data ss:Type="String">  1. TỔNG QUAN DOANH THU THÁNG 08/2026</Data></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Mã HM</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTh"><Data ss:Type="String">Hạng mục Doanh thu</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Doanh thu (VNĐ)</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Tỷ trọng (%)</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Tăng trưởng</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Trạng thái</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">HM-01</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdBold"><Data ss:Type="String">Doanh thu Gói tập Hội viên (Membership)</Data></Cell>
+    <Cell ss:StyleID="sMoneyRed"><Data ss:Type="String">34.800.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">72.1%</Data></Cell>
+    <Cell ss:StyleID="sBadgeGreen"><Data ss:Type="String">+11.5%</Data></Cell>
+    <Cell ss:StyleID="sBadgeGreen"><Data ss:Type="String">Đạt chỉ tiêu</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">HM-02</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdEvenBold"><Data ss:Type="String">Doanh thu Bán lẻ Sản phẩm (Whey / Nước / Phụ kiện)</Data></Cell>
+    <Cell ss:StyleID="sMoneyBlue"><Data ss:Type="String">13.450.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">27.9%</Data></Cell>
+    <Cell ss:StyleID="sBadgeGreen"><Data ss:Type="String">+28.5%</Data></Cell>
+    <Cell ss:StyleID="sBadgeGreen"><Data ss:Type="String">Tăng trưởng mạnh</Data></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:MergeAcross="2" ss:StyleID="sTotalRed"><Data ss:Type="String">TỔNG CỘNG DOANH THU THÁNG 8</Data></Cell>
+    <Cell ss:StyleID="sTotalRedMoney"><Data ss:Type="String">48.250.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTotalRed"><Data ss:Type="String">100.0%</Data></Cell>
+    <Cell ss:StyleID="sTotalRed"><Data ss:Type="String">+14.2%</Data></Cell>
+    <Cell ss:StyleID="sTotalRed"><Data ss:Type="String">Vượt KPI</Data></Cell>
+   </Row>
+   <Row ss:Height="14"><Cell ss:MergeAcross="6"/></Row>
 
-    <tr><td colspan="7" style="height: 18px;"></td></tr>
+   <!-- SECTION 2: PRODUCTS -->
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="6" ss:StyleID="sSecHeaderBlue"><Data ss:Type="String">  2. DOANH THU KINH DOANH SẢN PHẨM CHI TIẾT (WHEY, NƯỚC UỐNG, TRANG PHỤC, PHỤ KIỆN)</Data></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Mã SP</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Tên sản phẩm</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Danh mục</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Đơn giá bán</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Số lượng bán</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Tổng doanh thu</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Tỷ trọng SP</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">SP-101</Data></Cell>
+    <Cell ss:StyleID="sTdBold"><Data ss:Type="String">Whey Gold Standard 5lbs</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">Thực phẩm bổ sung (Supplement)</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">1.800.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">3 Hộp</Data></Cell>
+    <Cell ss:StyleID="sMoneyRed"><Data ss:Type="String">5.400.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">40.1%</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">SP-102</Data></Cell>
+    <Cell ss:StyleID="sTdEvenBold"><Data ss:Type="String">BCAA 6000 Phục hồi cơ</Data></Cell>
+    <Cell ss:StyleID="sTdEven"><Data ss:Type="String">Thực phẩm bổ sung (Supplement)</Data></Cell>
+    <Cell ss:StyleID="sTdEven"><Data ss:Type="String">850.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">3 Hộp</Data></Cell>
+    <Cell ss:StyleID="sMoneyRedEven"><Data ss:Type="String">2.550.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">19.0%</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">SP-103</Data></Cell>
+    <Cell ss:StyleID="sTdBold"><Data ss:Type="String">Nước tăng lực Monster Energy</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">Đồ uống &amp; Năng lượng (Beverage)</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">30.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">80 Lon</Data></Cell>
+    <Cell ss:StyleID="sMoneyBlue"><Data ss:Type="String">2.400.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">17.8%</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">SP-104</Data></Cell>
+    <Cell ss:StyleID="sTdEvenBold"><Data ss:Type="String">Áo thun tập gym Gymshark</Data></Cell>
+    <Cell ss:StyleID="sTdEven"><Data ss:Type="String">Trang phục thể thao (Clothing)</Data></Cell>
+    <Cell ss:StyleID="sTdEven"><Data ss:Type="String">250.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">8 Áo</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreenEven"><Data ss:Type="String">2.000.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">14.9%</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">SP-105</Data></Cell>
+    <Cell ss:StyleID="sTdBold"><Data ss:Type="String">Bình nước Shaker Gym 700ml</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">Phụ kiện tập luyện (Accessory)</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">120.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">9 Bình</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreen"><Data ss:Type="String">1.100.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">8.2%</Data></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:MergeAcross="3" ss:StyleID="sTotalBlue"><Data ss:Type="String">TỔNG DOANH THU KINH DOANH SẢN PHẨM (F&amp;B / WHEY)</Data></Cell>
+    <Cell ss:StyleID="sTotalBlue"><Data ss:Type="String">103 Đơn vị</Data></Cell>
+    <Cell ss:StyleID="sTotalBlueMoney"><Data ss:Type="String">13.450.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTotalBlue"><Data ss:Type="String">100.0%</Data></Cell>
+   </Row>
+   <Row ss:Height="14"><Cell ss:MergeAcross="6"/></Row>
 
-    <!-- PHẦN 3: HIỆU SUẤT HUẤN LUYỆN VIÊN -->
-    <tr>
-      <td colspan="7" class="section-title">3. HIỆU SUẤT DOANH THU THEO HUẤN LUYỆN VIÊN (HLV)</td>
-    </tr>
-    <tr>
-      <th class="th-cell">Mã HLV</th>
-      <th class="th-cell" colspan="2">Họ và tên HLV</th>
-      <th class="th-cell">Chuyên môn</th>
-      <th class="th-cell">Số học viên</th>
-      <th class="th-cell">Doanh thu phụ trách</th>
-      <th class="th-cell">Đánh giá sao</th>
-    </tr>
-    <tr>
-      <td class="td-center" style="font-weight: bold;">HLV-01</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold;">Nguyễn Minh Tuấn</td>
-      <td class="td-cell">Tăng cơ giảm mỡ &amp; PT Cá nhân</td>
-      <td class="td-center" style="font-weight: bold;">12 Học viên</td>
-      <td class="td-num" style="color: #059669; font-weight: bold;">18.500.000 VNĐ</td>
-      <td class="td-center badge-yellow">⭐⭐⭐⭐⭐ 4.9/5</td>
-    </tr>
-    <tr class="row-even">
-      <td class="td-center" style="font-weight: bold;">HLV-02</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold;">Trần Quốc Hùng</td>
-      <td class="td-cell">Bodybuilding &amp; Sức mạnh</td>
-      <td class="td-center" style="font-weight: bold;">15 Học viên</td>
-      <td class="td-num" style="color: #059669; font-weight: bold;">21.200.000 VNĐ</td>
-      <td class="td-center badge-yellow">⭐⭐⭐⭐⭐ 5.0/5</td>
-    </tr>
-    <tr>
-      <td class="td-center" style="font-weight: bold;">HLV-03</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold;">Lê Đức Mạnh</td>
-      <td class="td-cell">KickFit, Boxing &amp; Cardio</td>
-      <td class="td-center" style="font-weight: bold;">8 Học viên</td>
-      <td class="td-num" style="color: #059669; font-weight: bold;">9.800.000 VNĐ</td>
-      <td class="td-center badge-yellow">⭐⭐⭐⭐☆ 4.7/5</td>
-    </tr>
+   <!-- SECTION 3: TRAINERS -->
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="6" ss:StyleID="sSecHeaderRed"><Data ss:Type="String">  3. HIỆU SUẤT DOANH THU THEO HUẤN LUYỆN VIÊN (HLV)</Data></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Mã HLV</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTh"><Data ss:Type="String">Họ và tên HLV</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Chuyên môn đào tạo</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Số học viên</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Doanh thu phụ trách</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Đánh giá sao</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">HLV-01</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdBold"><Data ss:Type="String">Nguyễn Minh Tuấn</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">Tăng cơ giảm mỡ &amp; PT Cá nhân</Data></Cell>
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">12 Học viên</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreen"><Data ss:Type="String">18.500.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sBadgeYellow"><Data ss:Type="String">⭐⭐⭐⭐⭐ 4.9/5</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">HLV-02</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdEvenBold"><Data ss:Type="String">Trần Quốc Hùng</Data></Cell>
+    <Cell ss:StyleID="sTdEven"><Data ss:Type="String">Bodybuilding &amp; Sức mạnh</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">15 Học viên</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreenEven"><Data ss:Type="String">21.200.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sBadgeYellow"><Data ss:Type="String">⭐⭐⭐⭐⭐ 5.0/5</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">HLV-03</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdBold"><Data ss:Type="String">Lê Đức Mạnh</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">KickFit, Boxing &amp; Cardio</Data></Cell>
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">8 Học viên</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreen"><Data ss:Type="String">9.800.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sBadgeYellow"><Data ss:Type="String">⭐⭐⭐⭐☆ 4.7/5</Data></Cell>
+   </Row>
+   <Row ss:Height="14"><Cell ss:MergeAcross="6"/></Row>
 
-    <tr><td colspan="7" style="height: 18px;"></td></tr>
+   <!-- SECTION 4: PAYMENT METHODS -->
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="6" ss:StyleID="sSecHeaderBlue"><Data ss:Type="String">  4. CƠ CẤU PHƯƠNG THỨC THANH TOÁN (PAYMENT METHODS)</Data></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">STT</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTh"><Data ss:Type="String">Phương thức thanh toán</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Số giao dịch</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Doanh thu thu về</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Tỷ trọng</Data></Cell>
+    <Cell ss:StyleID="sTh"><Data ss:Type="String">Ghi chú</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">1</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdBold"><Data ss:Type="String">Chuyển khoản VietQR (Ngân hàng MB Bank)</Data></Cell>
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">21 Giao dịch</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreen"><Data ss:Type="String">28.950.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">60.0%</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">Chuyển khoản tự động</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">2</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdEvenBold"><Data ss:Type="String">Tiền mặt (Cash tại quầy tiếp tân)</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">11 Giao dịch</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreenEven"><Data ss:Type="String">11.500.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">23.8%</Data></Cell>
+    <Cell ss:StyleID="sTdEven"><Data ss:Type="String">Thu trực tiếp</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">3</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdBold"><Data ss:Type="String">Quẹt thẻ POS (Visa / MasterCard / ATM)</Data></Cell>
+    <Cell ss:StyleID="sTdCenterBold"><Data ss:Type="String">4 Giao dịch</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreen"><Data ss:Type="String">4.800.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdCenter"><Data ss:Type="String">10.0%</Data></Cell>
+    <Cell ss:StyleID="sTd"><Data ss:Type="String">Máy POS chi nhánh</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">4</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTdEvenBold"><Data ss:Type="String">Ví điện tử (MoMo / VNPay / ZaloPay)</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">2 Giao dịch</Data></Cell>
+    <Cell ss:StyleID="sMoneyGreenEven"><Data ss:Type="String">3.000.000 VNĐ</Data></Cell>
+    <Cell ss:StyleID="sTdEvenCenter"><Data ss:Type="String">6.2%</Data></Cell>
+    <Cell ss:StyleID="sTdEven"><Data ss:Type="String">Ví điện tử</Data></Cell>
+   </Row>
+   <Row ss:Height="24"><Cell ss:MergeAcross="6"/></Row>
 
-    <!-- PHẦN 4: CƠ CẤU PHƯƠNG THỨC THANH TOÁN -->
-    <tr>
-      <td colspan="7" class="section-title-blue">4. CƠ CẤU PHƯƠNG THỨC THANH TOÁN (PAYMENT METHODS)</td>
-    </tr>
-    <tr>
-      <th class="th-cell">STT</th>
-      <th class="th-cell" colspan="2">Phương thức thanh toán</th>
-      <th class="th-cell">Số giao dịch</th>
-      <th class="th-cell">Doanh thu thu về</th>
-      <th class="th-cell">Tỷ trọng</th>
-      <th class="th-cell">Ghi chú</th>
-    </tr>
-    <tr>
-      <td class="td-center">1</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold; color: #DC2626;">Chuyển khoản VietQR (Ngân hàng MB Bank)</td>
-      <td class="td-center" style="font-weight: bold;">21 Giao dịch</td>
-      <td class="td-num" style="color: #059669; font-weight: bold;">28.950.000 VNĐ</td>
-      <td class="td-center">60.0%</td>
-      <td class="td-center">Chuyển khoản tự động</td>
-    </tr>
-    <tr class="row-even">
-      <td class="td-center">2</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold; color: #059669;">Tiền mặt (Cash tại quầy tiếp tân)</td>
-      <td class="td-center" style="font-weight: bold;">11 Giao dịch</td>
-      <td class="td-num" style="color: #059669; font-weight: bold;">11.500.000 VNĐ</td>
-      <td class="td-center">23.8%</td>
-      <td class="td-center">Thu trực tiếp</td>
-    </tr>
-    <tr>
-      <td class="td-center">3</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold; color: #2563EB;">Quẹt thẻ POS (Visa / MasterCard / ATM)</td>
-      <td class="td-center" style="font-weight: bold;">4 Giao dịch</td>
-      <td class="td-num" style="color: #059669; font-weight: bold;">4.800.000 VNĐ</td>
-      <td class="td-center">10.0%</td>
-      <td class="td-center">Máy POS chi nhánh</td>
-    </tr>
-    <tr class="row-even">
-      <td class="td-center">4</td>
-      <td class="td-cell" colspan="2" style="font-weight: bold; color: #D97706;">Ví điện tử (MoMo / VNPay / ZaloPay)</td>
-      <td class="td-center" style="font-weight: bold;">2 Giao dịch</td>
-      <td class="td-num" style="color: #059669; font-weight: bold;">3.000.000 VNĐ</td>
-      <td class="td-center">6.2%</td>
-      <td class="td-center">Ví điện tử</td>
-    </tr>
+   <!-- SIGNATURES -->
+   <Row ss:Height="22">
+    <Cell ss:MergeAcross="1" ss:StyleID="sSignHead"><Data ss:Type="String">NGƯỜI LẬP BÁO CÁO</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="sSignHead"><Data ss:Type="String">KẾ TOÁN TRƯỞNG</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sSignHead"><Data ss:Type="String">GIÁM ĐỐC PHÒNG GYM</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:MergeAcross="1" ss:StyleID="sSignSub"><Data ss:Type="String">(Ký và ghi rõ họ tên)</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="sSignSub"><Data ss:Type="String">(Ký và ghi rõ họ tên)</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sSignSub"><Data ss:Type="String">(Ký, đóng dấu)</Data></Cell>
+   </Row>
+   <Row ss:Height="45"><Cell ss:MergeAcross="6"/></Row>
+   <Row ss:Height="22">
+    <Cell ss:MergeAcross="1" ss:StyleID="sSignName"><Data ss:Type="String">Văn Điền</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="sSignName"><Data ss:Type="String">Nguyễn Văn Quản Lý</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sSignName"><Data ss:Type="String">Ban Giám Đốc Fitness</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>`;
 
-    <tr><td colspan="7" style="height: 35px;"></td></tr>
-
-    <!-- Chữ ký xác nhận -->
-    <tr>
-      <td colspan="2" style="text-align: center; font-weight: bold; color: #1E293B;">NGƯỜI LẬP BÁO CÁO<br><span style="font-size: 9.5pt; font-weight: normal; color: #64748B;">(Ký và ghi rõ họ tên)</span></td>
-      <td colspan="3" style="text-align: center; font-weight: bold; color: #1E293B;">KẾ TOÁN TRƯỞNG<br><span style="font-size: 9.5pt; font-weight: normal; color: #64748B;">(Ký và ghi rõ họ tên)</span></td>
-      <td colspan="2" style="text-align: center; font-weight: bold; color: #1E293B;">GIÁM ĐỐC PHÒNG GYM<br><span style="font-size: 9.5pt; font-weight: normal; color: #64748B;">(Ký, đóng dấu)</span></td>
-    </tr>
-    <tr>
-      <td colspan="2" style="height: 60px;"></td>
-      <td colspan="3" style="height: 60px;"></td>
-      <td colspan="2" style="height: 60px;"></td>
-    </tr>
-    <tr>
-      <td colspan="2" style="text-align: center; font-weight: bold;">Văn Điền</td>
-      <td colspan="3" style="text-align: center; font-weight: bold;">Nguyễn Văn Quản Lý</td>
-      <td colspan="2" style="text-align: center; font-weight: bold;">Ban Giám Đốc Fitness</td>
-    </tr>
-  </table>
-</body>
-</html>
-  `;
-
-  const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+  const blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.setAttribute('href', url);
@@ -1295,8 +1526,9 @@ function exportReportToExcel() {
   link.click();
   document.body.removeChild(link);
 
-  showToast('🎉 Đã xuất file Báo cáo Excel (.xls) chuyên nghiệp có màu & độ rộng cột chuẩn thành công!', 'success');
+  showToast('🎉 Đã xuất file Báo cáo Excel chuẩn định dạng đẹp mắt không bị che chữ!', 'success');
 }
+
 
 
 window.switchAdminTab = switchAdminTab;
