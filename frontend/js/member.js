@@ -150,10 +150,14 @@ function handleMemberSearch() {
   loadMembers(query, status);
 }
 
+let pendingNewMemberData = null;
+
 function openAddMemberModal() {
   document.getElementById('memberModalTitle').textContent = 'Thêm Hội viên Mới';
   document.getElementById('memberForm').reset();
   document.getElementById('editMemberId').value = '';
+  const submitBtn = document.getElementById('btnMemberSubmit');
+  if (submitBtn) submitBtn.innerHTML = '<i class="fa fa-arrow-right"></i> Tiếp tục thanh toán VietQR';
   openModal('memberModal');
 }
 
@@ -207,6 +211,9 @@ async function openEditMemberModal(id) {
   document.getElementById('mPackage').value = member.PackageName || 'Gói 1 tháng';
   document.getElementById('mStatus').value = member.Status || 'Active';
 
+  const submitBtn = document.getElementById('btnMemberSubmit');
+  if (submitBtn) submitBtn.innerHTML = '<i class="fa fa-save"></i> Cập nhật thông tin';
+
   openModal('memberModal');
 }
 
@@ -243,6 +250,7 @@ async function handleSaveMember(e) {
     Address: address,
     PackageName: packageName,
     Status: status,
+    JoinDate: startDate.toISOString().split('T')[0],
     EndDate: endDate.toISOString().split('T')[0]
   };
 
@@ -255,14 +263,88 @@ async function handleSaveMember(e) {
     memberData.MemberID = Number(id);
     await GymAPI.updateMember(memberData);
     showToast('Cập nhật thông tin hội viên thành công!', 'success');
+    closeModal('memberModal');
+    loadMembers();
   } else {
-    await GymAPI.addMember(memberData);
-    showToast('Thêm hội viên mới thành công!', 'success');
+    // Thêm mới hội viên -> Mở popup thanh toán VietQR
+    const packages = await GymAPI.getPackages();
+    const pkg = packages.find(p => p.PackageName === packageName) || { Price: 500000, PackageID: 1 };
+    const members = await GymAPI.getMembers();
+    const nextCode = `HV-${String(1000 + members.length + 1).padStart(4, '0')}`;
+
+    memberData.Code = nextCode;
+    memberData.Price = pkg.Price || 500000;
+    memberData.PackageID = pkg.PackageID || 1;
+    pendingNewMemberData = memberData;
+
+    // Cập nhật thông tin lên popup VietQR
+    document.getElementById('qrMemberName').textContent = fullname;
+    document.getElementById('qrMemberCode').textContent = nextCode;
+    document.getElementById('qrPackageName').textContent = packageName;
+    document.getElementById('qrExpiryDate').textContent = formatDate(memberData.EndDate);
+    document.getElementById('qrAmountDisplay').textContent = formatVND(memberData.Price);
+
+    // Tạo mã VietQR chuẩn ngân hàng MB Bank
+    const transferNote = `${nextCode.replace('-','')} ${packageName.replace(/\s+/g, '')}`;
+    const qrUrl = `https://img.vietqr.io/image/MB-0901234567-compact2.png?amount=${memberData.Price}&addInfo=${encodeURIComponent(transferNote)}&accountName=PHONG%20TAP%20FITNESS`;
+    const qrImg = document.getElementById('qrImageDisplay');
+    if (qrImg) qrImg.src = qrUrl;
+
+    closeModal('memberModal');
+    openModal('memberPaymentModal');
+  }
+}
+
+/**
+ * Xác nhận thanh toán và kích hoạt gói tập cho hội viên mới
+ * @param {boolean} isPaid - true: Đã thu tiền / false: Thanh toán sau
+ */
+async function confirmMemberPayment(isPaid = true) {
+  if (!pendingNewMemberData) return;
+
+  const db = MockDB.getDB();
+  const newMemberId = db.members.length > 0 ? Math.max(...db.members.map(m => m.MemberID)) + 1 : 1;
+  const newMember = {
+    MemberID: newMemberId,
+    ...pendingNewMemberData,
+    Status: isPaid ? 'Active' : 'Expired'
+  };
+
+  db.members.push(newMember);
+
+  if (isPaid) {
+    // Tạo hóa đơn thanh toán hoàn thành
+    const payMethodEl = document.querySelector('input[name="payMethod"]:checked');
+    const payMethod = payMethodEl ? payMethodEl.value : 'VietQR';
+    const newPaymentId = db.payments && db.payments.length > 0 ? Math.max(...db.payments.map(p => p.PaymentsID || 0)) + 1 : 1;
+
+    const newPayment = {
+      PaymentsID: newPaymentId,
+      MemberPackageID: newMemberId,
+      MemberName: newMember.Fullname,
+      MemberCode: newMember.Code,
+      PackageName: newMember.PackageName,
+      Amount: newMember.Price,
+      PaymentMethod: payMethod,
+      PaymentDate: new Date().toISOString().split('T')[0],
+      Status: 'Completed'
+    };
+
+    if (!db.payments) db.payments = [];
+    db.payments.unshift(newPayment);
+    MockDB.saveDB(db);
+
+    showToast(`🎉 Đã thu ${formatVND(newMember.Price)} (${payMethod}) & Kích hoạt gói tập cho ${newMember.Fullname}!`, 'success');
+  } else {
+    MockDB.saveDB(db);
+    showToast(`Đã lưu hồ sơ hội viên ${newMember.Fullname} (Chờ thanh toán sau)!`, 'info');
   }
 
-  closeModal('memberModal');
+  pendingNewMemberData = null;
+  closeModal('memberPaymentModal');
   loadMembers();
 }
+
 
 async function handleDeleteMember(id) {
   const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { Role: 'Admin' };
@@ -702,6 +784,7 @@ window.handleSaveInBody = handleSaveInBody;
 window.openAddWorkoutPlanModal = openAddWorkoutPlanModal;
 window.filterWorkoutPlans = filterWorkoutPlans;
 window.filterWorkoutPlanStatus = filterWorkoutPlanStatus;
-window.handleAttendanceSearch = handleAttendanceSearch;
+window.confirmMemberPayment = confirmMemberPayment;
+
 
 
