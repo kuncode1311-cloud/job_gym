@@ -97,52 +97,67 @@ async function loadMembers(query = '', statusFilter = 'all') {
   const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { Role: 'Admin' };
   const isAdmin = currentUser.Role === 'Admin' || currentUser.Role === 'Manager';
 
-  tableBody.innerHTML = members.map(m => `
-    <tr>
-      <td>
-        <div class="member-avatar-cell">
-          <div class="avatar-circle">${m.Fullname.split(' ').pop()[0]}</div>
-          <div>
-            <div style="font-weight: 700; color: #FFFFFF;">${m.Fullname}</div>
-            <div style="font-size: 12px; color: var(--text-muted);">${m.Email || 'Chưa cập nhật email'}</div>
+  tableBody.innerHTML = members.map(m => {
+    let statusBadge = `<span class="badge badge-green" style="gap: 4px;"><i class="fa fa-check-circle"></i> Đang hoạt động</span>`;
+    if (m.Status === 'Pending' || m.Status === 'Chờ thanh toán') {
+      statusBadge = `<span class="badge badge-yellow" style="gap: 4px;"><i class="fa fa-clock"></i> Chờ thanh toán</span>`;
+    } else if (m.Status === 'Expired' || m.Status === 'Hết hạn') {
+      statusBadge = `<span class="badge badge-red" style="gap: 4px;"><i class="fa fa-ban"></i> Hết hạn</span>`;
+    }
+
+    const isPending = m.Status === 'Pending' || m.Status === 'Chờ thanh toán';
+
+    return `
+      <tr>
+        <td>
+          <div class="member-avatar-cell">
+            <div class="avatar-circle">${m.Fullname.split(' ').pop()[0]}</div>
+            <div>
+              <div style="font-weight: 700; color: #FFFFFF;">${m.Fullname}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">${m.Email || 'Chưa cập nhật email'}</div>
+            </div>
           </div>
-        </div>
-      </td>
-      <td class="code-highlight">${m.Code || `HV-${m.MemberID}`}</td>
-      <td>${m.Phone || '—'}</td>
-      <td style="font-weight: 600;">${m.PackageName || 'Chưa đăng ký'}</td>
-      <td>${formatDate(m.JoinDate)}</td>
-      <td>${formatDate(m.EndDate) || '—'}</td>
-      <td>
-        <span class="badge ${m.Status === 'Active' ? 'badge-green' : 'badge-red'}">
-          ${m.Status === 'Active' ? 'Đang hoạt động' : 'Hết hạn'}
-        </span>
-      </td>
-      <td>
-        <div class="action-btn-group">
-          ${isAdmin ? `
-            <button class="btn-action-icon" title="Chỉnh sửa thông tin & gói tập" onclick="openEditMemberModal(${m.MemberID})">
-              <i class="fa fa-edit"></i>
-            </button>
-            <button class="btn-action-icon" title="Xem InBody & Sức khỏe" onclick="viewMemberInBody(${m.MemberID})">
-              <i class="fa fa-heartbeat"></i>
-            </button>
-            <button class="btn-action-icon btn-danger" title="Xóa hội viên" onclick="handleDeleteMember(${m.MemberID})">
-              <i class="fa fa-trash"></i>
-            </button>
-          ` : `
-            <button class="btn-action-icon" title="Xem chi tiết hồ sơ" onclick="openViewMemberDetailModal(${m.MemberID})">
-              <i class="fa fa-eye"></i>
-            </button>
-            <button class="btn-action-icon" title="Xem InBody & Sức khỏe" onclick="viewMemberInBody(${m.MemberID})">
-              <i class="fa fa-heartbeat"></i>
-            </button>
-          `}
-        </div>
-      </td>
-    </tr>
-  `).join('');
+        </td>
+        <td class="code-highlight">${m.Code || `HV-${m.MemberID}`}</td>
+        <td>${m.Phone || '—'}</td>
+        <td style="font-weight: 600;">${m.PackageName || 'Chưa đăng ký'}</td>
+        <td>${formatDate(m.JoinDate)}</td>
+        <td>${formatDate(m.EndDate) || '—'}</td>
+        <td>
+          ${statusBadge}
+        </td>
+        <td>
+          <div class="action-btn-group">
+            ${isPending ? `
+              <button class="btn btn-primary btn-sm" style="font-size: 11.5px; padding: 4px 10px; font-weight: 700;" onclick="openCollectPaymentModal(${m.MemberID})" title="Thu tiền &amp; Kích hoạt gói ngay">
+                <i class="fa fa-qrcode"></i> Thu tiền
+              </button>
+            ` : ''}
+            ${isAdmin ? `
+              <button class="btn-action-icon" title="Chỉnh sửa thông tin & gói tập" onclick="openEditMemberModal(${m.MemberID})">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="btn-action-icon" title="Xem InBody & Sức khỏe" onclick="viewMemberInBody(${m.MemberID})">
+                <i class="fa fa-heartbeat"></i>
+              </button>
+              <button class="btn-action-icon btn-danger" title="Xóa hội viên" onclick="handleDeleteMember(${m.MemberID})">
+                <i class="fa fa-trash"></i>
+              </button>
+            ` : `
+              <button class="btn-action-icon" title="Xem chi tiết hồ sơ" onclick="openViewMemberDetailModal(${m.MemberID})">
+                <i class="fa fa-eye"></i>
+              </button>
+              <button class="btn-action-icon" title="Xem InBody & Sức khỏe" onclick="viewMemberInBody(${m.MemberID})">
+                <i class="fa fa-heartbeat"></i>
+              </button>
+            `}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
+
 
 function handleMemberSearch() {
   const query = document.getElementById('memberSearchInput').value;
@@ -303,47 +318,110 @@ async function confirmMemberPayment(isPaid = true) {
   if (!pendingNewMemberData) return;
 
   const db = MockDB.getDB();
-  const newMemberId = db.members.length > 0 ? Math.max(...db.members.map(m => m.MemberID)) + 1 : 1;
-  const newMember = {
-    MemberID: newMemberId,
-    ...pendingNewMemberData,
-    Status: isPaid ? 'Active' : 'Expired'
-  };
+  const existingMemberIndex = db.members.findIndex(m => m.MemberID === pendingNewMemberData.MemberID);
 
-  db.members.push(newMember);
+  let targetMember = null;
+
+  if (existingMemberIndex !== -1) {
+    // Hội viên đã có trong hệ thống (Đang ở trạng thái Chờ thanh toán)
+    db.members[existingMemberIndex].Status = isPaid ? 'Active' : 'Pending';
+    targetMember = db.members[existingMemberIndex];
+  } else {
+    // Thêm mới hội viên
+    const newMemberId = db.members.length > 0 ? Math.max(...db.members.map(m => m.MemberID)) + 1 : 1;
+    targetMember = {
+      MemberID: newMemberId,
+      ...pendingNewMemberData,
+      Status: isPaid ? 'Active' : 'Pending'
+    };
+    db.members.push(targetMember);
+  }
+
+  const payMethodEl = document.querySelector('input[name="payMethod"]:checked');
+  const payMethod = payMethodEl ? payMethodEl.value : 'VietQR';
+  const newPaymentId = db.payments && db.payments.length > 0 ? Math.max(...db.payments.map(p => p.PaymentsID || 0)) + 1 : 1;
 
   if (isPaid) {
-    // Tạo hóa đơn thanh toán hoàn thành
-    const payMethodEl = document.querySelector('input[name="payMethod"]:checked');
-    const payMethod = payMethodEl ? payMethodEl.value : 'VietQR';
-    const newPaymentId = db.payments && db.payments.length > 0 ? Math.max(...db.payments.map(p => p.PaymentsID || 0)) + 1 : 1;
-
-    const newPayment = {
-      PaymentsID: newPaymentId,
-      MemberPackageID: newMemberId,
-      MemberName: newMember.Fullname,
-      MemberCode: newMember.Code,
-      PackageName: newMember.PackageName,
-      Amount: newMember.Price,
-      PaymentMethod: payMethod,
-      PaymentDate: new Date().toISOString().split('T')[0],
-      Status: 'Completed'
-    };
-
-    if (!db.payments) db.payments = [];
-    db.payments.unshift(newPayment);
+    // Kiểm tra xem đã có bản ghi thanh toán chờ trước đó chưa
+    const pendingPayment = db.payments ? db.payments.find(p => p.MemberCode === targetMember.Code && p.Status === 'Pending') : null;
+    if (pendingPayment) {
+      pendingPayment.Status = 'Completed';
+      pendingPayment.PaymentMethod = payMethod;
+      pendingPayment.PaymentDate = new Date().toISOString().split('T')[0];
+    } else {
+      const newPayment = {
+        PaymentsID: newPaymentId,
+        MemberPackageID: targetMember.MemberID,
+        MemberName: targetMember.Fullname,
+        MemberCode: targetMember.Code,
+        PackageName: targetMember.PackageName,
+        Amount: targetMember.Price,
+        PaymentMethod: payMethod,
+        PaymentDate: new Date().toISOString().split('T')[0],
+        Status: 'Completed'
+      };
+      if (!db.payments) db.payments = [];
+      db.payments.unshift(newPayment);
+    }
     MockDB.saveDB(db);
-
-    showToast(`🎉 Đã thu ${formatVND(newMember.Price)} (${payMethod}) & Kích hoạt gói tập cho ${newMember.Fullname}!`, 'success');
+    showToast(`🎉 Đã thu ${formatVND(targetMember.Price)} (${payMethod}) & Kích hoạt gói tập cho ${targetMember.Fullname}!`, 'success');
   } else {
+    // Lưu bản ghi trạng thái Chờ thanh toán vào db.payments
+    const existingPending = db.payments ? db.payments.find(p => p.MemberCode === targetMember.Code && p.Status === 'Pending') : null;
+    if (!existingPending) {
+      const pendingPayment = {
+        PaymentsID: newPaymentId,
+        MemberPackageID: targetMember.MemberID,
+        MemberName: targetMember.Fullname,
+        MemberCode: targetMember.Code,
+        PackageName: targetMember.PackageName,
+        Amount: targetMember.Price,
+        PaymentMethod: payMethod,
+        PaymentDate: new Date().toISOString().split('T')[0],
+        Status: 'Pending'
+      };
+      if (!db.payments) db.payments = [];
+      db.payments.unshift(pendingPayment);
+    }
     MockDB.saveDB(db);
-    showToast(`Đã lưu hồ sơ hội viên ${newMember.Fullname} (Chờ thanh toán sau)!`, 'info');
+    showToast(`Đã lưu hồ sơ hội viên ${targetMember.Fullname} (Trạng thái: Chờ thanh toán)!`, 'info');
   }
 
   pendingNewMemberData = null;
   closeModal('memberPaymentModal');
   loadMembers();
 }
+
+/**
+ * Mở popup thu tiền VietQR cho hội viên đang ở trạng thái 'Chờ thanh toán'
+ */
+async function openCollectPaymentModal(memberId) {
+  const member = await GymAPI.getMemberById(memberId);
+  if (!member) return;
+
+  const packages = await GymAPI.getPackages();
+  const pkg = packages.find(p => p.PackageName === member.PackageName) || { Price: 500000, PackageID: 1 };
+
+  pendingNewMemberData = {
+    ...member,
+    Price: pkg.Price || 500000,
+    PackageID: pkg.PackageID || 1
+  };
+
+  document.getElementById('qrMemberName').textContent = member.Fullname;
+  document.getElementById('qrMemberCode').textContent = member.Code || `HV-${member.MemberID}`;
+  document.getElementById('qrPackageName').textContent = member.PackageName || 'Gói 1 tháng';
+  document.getElementById('qrExpiryDate').textContent = formatDate(member.EndDate) || '30 ngày';
+  document.getElementById('qrAmountDisplay').textContent = formatVND(pendingNewMemberData.Price);
+
+  const transferNote = `${(member.Code || 'HV').replace('-','')} ${(member.PackageName || 'GOI').replace(/\s+/g, '')}`;
+  const qrUrl = `https://img.vietqr.io/image/MB-0901234567-compact2.png?amount=${pendingNewMemberData.Price}&addInfo=${encodeURIComponent(transferNote)}&accountName=PHONG%20TAP%20FITNESS`;
+  const qrImg = document.getElementById('qrImageDisplay');
+  if (qrImg) qrImg.src = qrUrl;
+
+  openModal('memberPaymentModal');
+}
+
 
 
 async function handleDeleteMember(id) {
@@ -785,6 +863,9 @@ window.openAddWorkoutPlanModal = openAddWorkoutPlanModal;
 window.filterWorkoutPlans = filterWorkoutPlans;
 window.filterWorkoutPlanStatus = filterWorkoutPlanStatus;
 window.confirmMemberPayment = confirmMemberPayment;
+window.openCollectPaymentModal = openCollectPaymentModal;
+window.handleAttendanceSearch = handleAttendanceSearch;
+
 
 
 

@@ -138,14 +138,16 @@
                   <input type="text" id="memberSearchInput" placeholder="Tìm tên, mã HV, SĐT..." onkeyup="handleMemberSearch()">
                 </div>
 
-                <select id="memberStatusFilter" class="form-control" style="width: 170px;" onchange="handleMemberSearch()">
+                <select id="memberStatusFilter" class="form-control" style="width: 190px;" onchange="handleMemberSearch()">
                   <option value="all">Tất cả trạng thái</option>
-                  <option value="Active">Đang hoạt động</option>
+                  <option value="Active">Đang hoạt động (Đã TT)</option>
+                  <option value="Pending">Chờ thanh toán</option>
                   <option value="Expired">Đã hết hạn</option>
                 </select>
 
                 <span id="totalMemberCount" class="badge badge-blue">0 Hội viên</span>
               </div>
+
 
               <button class="btn btn-primary" onclick="openAddMemberModal()">
                 <i class="fa fa-user-plus"></i> + Thêm hội viên
@@ -815,17 +817,18 @@
           <!-- Payment Method Selector -->
           <div>
             <label class="form-label" style="font-size: 12.5px; margin-bottom: 6px;">Phương thức thanh toán:</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-              <label style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); cursor: pointer; font-size: 13px; color: #FFFFFF;">
-                <input type="radio" name="payMethod" value="VietQR" checked style="accent-color: #FF334B;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <label style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); padding: 9px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); cursor: pointer; font-size: 13px; color: #FFFFFF; font-weight: 600;">
+                <input type="radio" name="payMethod" value="VietQR" checked style="accent-color: #FF334B; width: 16px; height: 16px; margin: 0;">
                 <span>📱 Chuyển khoản VietQR</span>
               </label>
-              <label style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); cursor: pointer; font-size: 13px; color: #FFFFFF;">
-                <input type="radio" name="payMethod" value="Tiền mặt" style="accent-color: #FF334B;">
+              <label style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); padding: 9px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); cursor: pointer; font-size: 13px; color: #FFFFFF; font-weight: 600;">
+                <input type="radio" name="payMethod" value="Tiền mặt" style="accent-color: #FF334B; width: 16px; height: 16px; margin: 0;">
                 <span>💵 Tiền mặt (Cash)</span>
               </label>
             </div>
           </div>
+
 
           <!-- Buttons -->
           <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
