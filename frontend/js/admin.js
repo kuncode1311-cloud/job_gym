@@ -1526,8 +1526,9 @@ function exportReportToExcel() {
   link.click();
   document.body.removeChild(link);
 
-  showToast('🎉 Đã xuất file Báo cáo Excel chuẩn định dạng đẹp mắt không bị che chữ!', 'success');
+  showToast('Xuất báo cáo Excel thành công!', 'success');
 }
+
 
 
 
