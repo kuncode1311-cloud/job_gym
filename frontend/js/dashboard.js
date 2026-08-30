@@ -288,9 +288,13 @@ async function loadStaffPosItems(category = 'all') {
   }
 
   tableBody.innerHTML = items.map(item => {
+    const itemName = item.ProductName || item.Name;
+    const itemId = item.ProductID || item.ID;
+
     let catBadgeClass = 'badge-blue';
-    if (item.Category === 'Phụ kiện') catBadgeClass = 'badge-yellow';
-    else if (item.Category === 'Dịch vụ') catBadgeClass = 'badge-red';
+    if (item.Category === 'Clothing' || item.Category === 'Trang phục') catBadgeClass = 'badge-yellow';
+    else if (item.Category === 'Accessory' || item.Category === 'Phụ kiện') catBadgeClass = 'badge-red';
+    else if (item.Category === 'Beverage' || item.Category === 'Đồ uống') catBadgeClass = 'badge-green';
 
     const isOutOfStock = item.Stock !== undefined && item.Stock <= 0;
     const stockDisplay = isOutOfStock
@@ -299,7 +303,7 @@ async function loadStaffPosItems(category = 'all') {
 
     return `
       <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-        <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">${item.Name}</td>
+        <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">${itemName}</td>
         <td style="padding: 14px 16px; text-align: center;"><span class="badge ${catBadgeClass}">${item.Category}</span></td>
         <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">${formatVND(item.Price)}</td>
         <td style="padding: 14px 16px; text-align: center;">${stockDisplay}</td>
@@ -309,7 +313,7 @@ async function loadStaffPosItems(category = 'all') {
               <i class="fa fa-ban"></i> Hết hàng
             </button>
           ` : `
-            <button class="btn btn-primary btn-sm" style="font-weight: 700; padding: 6px 14px;" onclick="handleStaffQuickSell(${item.ID})">
+            <button class="btn btn-primary btn-sm" style="font-weight: 700; padding: 6px 14px;" onclick="handleStaffQuickSell(${itemId})">
               <i class="fa fa-shopping-cart"></i> Bán ngay
             </button>
           `}
@@ -318,6 +322,7 @@ async function loadStaffPosItems(category = 'all') {
     `;
   }).join('');
 }
+
 
 function filterStaffPos(category, event) {
   document.querySelectorAll('#staffPosTabs .tab-btn').forEach(b => b.classList.remove('active'));

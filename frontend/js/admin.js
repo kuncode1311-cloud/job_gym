@@ -425,33 +425,44 @@ async function loadInventory(category = 'all') {
     items = items.filter(i => i.Category === category);
   }
 
-  tableBody.innerHTML = items.map(i => `
-    <tr>
-      <td style="font-weight: 700; color: #FFFFFF;">${i.Name}</td>
-      <td><span class="badge badge-blue">${i.Category}</span></td>
-      <td class="price-highlight">${formatVND(i.Price)}</td>
-      <td style="font-weight: 700; color: #E5E7EB;">${i.Stock !== undefined ? i.Stock : 100}</td>
-      <td>
-        <span class="badge ${i.Status === 'Còn hàng' ? 'badge-green' : 'badge-red'}">
-          ${i.Status}
-        </span>
-      </td>
-      <td>
-        ${isAdmin ? `
-          <button class="btn btn-secondary btn-sm" onclick="openEditInventoryModal(${i.ID})" title="Sửa sản phẩm">
-            <i class="fa fa-edit"></i> Sửa
-          </button>
-          <button class="btn btn-sm" style="background: rgba(255,51,75,0.15); color: #FF334B; border: 1px solid rgba(255,51,75,0.3); margin-left: 6px;" onclick="handleDeleteInventory(${i.ID})" title="Xóa sản phẩm">
-            <i class="fa fa-trash"></i> Xóa
-          </button>
-        ` : `
-          <button class="btn btn-secondary btn-sm" style="background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid rgba(16,185,129,0.3); font-weight: 600;" onclick="openStaffStockModal(${i.ID})">
-            <i class="fa fa-plus"></i> Thêm số lượng
-          </button>
-        `}
-      </td>
-    </tr>
-  `).join('');
+  tableBody.innerHTML = items.map(i => {
+    const itemName = i.ProductName || i.Name;
+    const itemId = i.ProductID || i.ID;
+
+    let catBadgeClass = 'badge-blue';
+    if (i.Category === 'Clothing') catBadgeClass = 'badge-yellow';
+    else if (i.Category === 'Accessory') catBadgeClass = 'badge-red';
+    else if (i.Category === 'Beverage') catBadgeClass = 'badge-green';
+
+    return `
+      <tr>
+        <td style="font-weight: 700; color: #FFFFFF;">${itemName}</td>
+        <td><span class="badge ${catBadgeClass}">${i.Category}</span></td>
+        <td class="price-highlight">${formatVND(i.Price)}</td>
+        <td style="font-weight: 700; color: #E5E7EB;">${i.Stock !== undefined ? i.Stock : 0}</td>
+        <td>
+          <span class="badge ${i.Stock > 0 ? 'badge-green' : 'badge-red'}">
+            ${i.Stock > 0 ? 'Còn hàng' : 'Hết hàng'}
+          </span>
+        </td>
+        <td>
+          ${isAdmin ? `
+            <button class="btn btn-secondary btn-sm" onclick="openEditInventoryModal(${itemId})" title="Sửa sản phẩm">
+              <i class="fa fa-edit"></i> Sửa
+            </button>
+            <button class="btn btn-sm" style="background: rgba(255,51,75,0.15); color: #FF334B; border: 1px solid rgba(255,51,75,0.3); margin-left: 6px;" onclick="handleDeleteInventory(${itemId})" title="Xóa sản phẩm">
+              <i class="fa fa-trash"></i> Xóa
+            </button>
+          ` : `
+            <button class="btn btn-secondary btn-sm" style="background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid rgba(16,185,129,0.3); font-weight: 600;" onclick="openStaffStockModal(${itemId})">
+              <i class="fa fa-plus"></i> Thêm số lượng
+            </button>
+          `}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
 }
 
 function filterInventory(category, event) {
@@ -469,12 +480,12 @@ function openAddInventoryModal() {
 
 async function openEditInventoryModal(id) {
   const items = await GymAPI.getInventory();
-  const item = items.find(i => i.ID === Number(id));
+  const item = items.find(i => (i.ProductID || i.ID) === Number(id));
   if (!item) return;
 
   document.getElementById('invModalTitle').textContent = 'Chỉnh sửa Sản phẩm / Dịch vụ';
-  document.getElementById('invId').value = item.ID;
-  document.getElementById('invName').value = item.Name;
+  document.getElementById('invId').value = item.ProductID || item.ID;
+  document.getElementById('invName').value = item.ProductName || item.Name;
   document.getElementById('invCategory').value = item.Category;
   document.getElementById('invPrice').value = item.Price;
   document.getElementById('invStock').value = item.Stock !== undefined ? item.Stock : 10;
@@ -490,15 +501,16 @@ async function handleDeleteInventory(id) {
 
 async function openStaffStockModal(id) {
   const items = await GymAPI.getInventory();
-  const item = items.find(i => i.ID === Number(id));
+  const item = items.find(i => (i.ProductID || i.ID) === Number(id));
   if (!item) return;
 
-  document.getElementById('staffStockItemId').value = item.ID;
-  document.getElementById('staffStockItemName').value = item.Name;
+  document.getElementById('staffStockItemId').value = item.ProductID || item.ID;
+  document.getElementById('staffStockItemName').value = item.ProductName || item.Name;
   document.getElementById('staffStockCurrent').value = item.Stock !== undefined ? item.Stock : 0;
   document.getElementById('staffStockAddQty').value = '';
   openModal('staffStockModal');
 }
+
 
 async function handleStaffStockIncrement(e) {
   e.preventDefault();

@@ -105,10 +105,12 @@
             <div class="card-header-flex" style="margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
               <div class="filter-tabs" id="inventoryTabs">
                 <button class="tab-btn active" onclick="filterInventory('all', event)">Tất cả</button>
-                <button class="tab-btn" onclick="filterInventory('Đồ uống', event)">Đồ uống</button>
-                <button class="tab-btn" onclick="filterInventory('Phụ kiện', event)">Phụ kiện</button>
-                <button class="tab-btn" onclick="filterInventory('Dịch vụ', event)">Dịch vụ</button>
+                <button class="tab-btn" onclick="filterInventory('Supplement', event)">Supplement</button>
+                <button class="tab-btn" onclick="filterInventory('Clothing', event)">Clothing</button>
+                <button class="tab-btn" onclick="filterInventory('Accessory', event)">Accessory</button>
+                <button class="tab-btn" onclick="filterInventory('Beverage', event)">Beverage</button>
               </div>
+
 
               <button id="addInventoryBtn" class="btn btn-primary" onclick="openAddInventoryModal()">
                 <i class="fa fa-plus"></i> + Thêm mặt hàng
@@ -822,12 +824,14 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
           <div class="form-group">
-            <label class="form-label">Phân loại</label>
+            <label class="form-label">Phân loại (Category)</label>
             <select id="invCategory" class="form-control">
-              <option value="Đồ uống">Đồ uống</option>
-              <option value="Phụ kiện">Phụ kiện</option>
-              <option value="Dịch vụ">Dịch vụ</option>
+              <option value="Supplement">Supplement (Thực phẩm bổ sung)</option>
+              <option value="Clothing">Clothing (Trang phục thể thao)</option>
+              <option value="Accessory">Accessory (Phụ kiện tập gym)</option>
+              <option value="Beverage">Beverage (Đồ uống đóng chai)</option>
             </select>
+
           </div>
           <div class="form-group">
             <label class="form-label">Đơn giá (VNĐ) *</label>

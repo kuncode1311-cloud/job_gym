@@ -5,7 +5,7 @@
  * ==============================================================================
  */
 
-const STORAGE_KEY = 'GYM_MANAGEMENT_DB_V4';
+const STORAGE_KEY = 'GYM_MANAGEMENT_DB_V5';
 
 
 // Dữ liệu đúng từng bản ghi trong gym_management.sql
@@ -120,24 +120,37 @@ const DEFAULT_DATABASE = {
     { FeedbackID: 6, TrainerID: 2, TrainerName: 'Trần Quốc Hùng', MemberName: 'Đặng Quốc Huy', Rating: 3, Comment: 'Cần cải thiện thời gian phản hồi.', FeedbackDate: '2026-03-10' }
   ],
 
-  // Bảng mở rộng: Menu / Kho sản phẩm theo yêu cầu phân công
+  // 12. Bảng products / Kho hàng bán lẻ (Khớp 100% CSDL MySQL `gym_management_system.products`)
+  products: [
+    { ProductID: 1, ID: 1, ProductName: 'Whey Protein', Name: 'Whey Protein', Category: 'Supplement', Price: 850000, Stock: 20, Description: 'Sữa protein hỗ trợ bổ sung đạm cho người tập gym', Status: 'Active' },
+    { ProductID: 2, ID: 2, ProductName: 'Mass Gainer', Name: 'Mass Gainer', Category: 'Supplement', Price: 720000, Stock: 15, Description: 'Sản phẩm hỗ trợ tăng cân và bổ sung năng lượng', Status: 'Active' },
+    { ProductID: 3, ID: 3, ProductName: 'Pre Workout', Name: 'Pre Workout', Category: 'Supplement', Price: 450000, Stock: 10, Description: 'Thực phẩm bổ sung trước khi tập luyện', Status: 'Active' },
+    { ProductID: 4, ID: 4, ProductName: 'Áo Gym', Name: 'Áo Gym', Category: 'Clothing', Price: 250000, Stock: 30, Description: 'Áo thể thao dành cho hội viên', Status: 'Active' },
+    { ProductID: 5, ID: 5, ProductName: 'Quần Short Gym', Name: 'Quần Short Gym', Category: 'Clothing', Price: 220000, Stock: 25, Description: 'Quần short thể thao', Status: 'Active' },
+    { ProductID: 6, ID: 6, ProductName: 'Găng Tay Gym', Name: 'Găng Tay Gym', Category: 'Accessory', Price: 180000, Stock: 20, Description: 'Găng tay hỗ trợ tập luyện', Status: 'Active' },
+    { ProductID: 7, ID: 7, ProductName: 'Bình Nước Gym', Name: 'Bình Nước Gym', Category: 'Accessory', Price: 120000, Stock: 35, Description: 'Bình nước thể thao 750ml', Status: 'Active' },
+    { ProductID: 8, ID: 8, ProductName: 'Nước Suối', Name: 'Nước Suối', Category: 'Beverage', Price: 15000, Stock: 100, Description: 'Nước suối đóng chai', Status: 'Active' }
+  ],
+
   inventory: [
-    { ID: 1, Name: 'Nước protein shake', Category: 'Đồ uống', Price: 45000, Status: 'Còn hàng', Stock: 85 },
-    { ID: 2, Name: 'Nước BCAA', Category: 'Đồ uống', Price: 35000, Status: 'Còn hàng', Stock: 60 },
-    { ID: 3, Name: 'Khăn tập', Category: 'Phụ kiện', Price: 50000, Status: 'Hết hàng', Stock: 0 },
-    { ID: 4, Name: 'Bao tay tập', Category: 'Phụ kiện', Price: 120000, Status: 'Còn hàng', Stock: 24 },
-    { ID: 5, Name: 'Personal training 1 buổi', Category: 'Dịch vụ', Price: 200000, Status: 'Còn hàng', Stock: 999 },
-    { ID: 6, Name: 'Massage sau tập', Category: 'Dịch vụ', Price: 150000, Status: 'Còn hàng', Stock: 999 }
+    { ProductID: 1, ID: 1, ProductName: 'Whey Protein', Name: 'Whey Protein', Category: 'Supplement', Price: 850000, Stock: 20, Description: 'Sữa protein hỗ trợ bổ sung đạm cho người tập gym', Status: 'Còn hàng' },
+    { ProductID: 2, ID: 2, ProductName: 'Mass Gainer', Name: 'Mass Gainer', Category: 'Supplement', Price: 720000, Stock: 15, Description: 'Sản phẩm hỗ trợ tăng cân và bổ sung năng lượng', Status: 'Còn hàng' },
+    { ProductID: 3, ID: 3, ProductName: 'Pre Workout', Name: 'Pre Workout', Category: 'Supplement', Price: 450000, Stock: 10, Description: 'Thực phẩm bổ sung trước khi tập luyện', Status: 'Còn hàng' },
+    { ProductID: 4, ID: 4, ProductName: 'Áo Gym', Name: 'Áo Gym', Category: 'Clothing', Price: 250000, Stock: 30, Description: 'Áo thể thao dành cho hội viên', Status: 'Còn hàng' },
+    { ProductID: 5, ID: 5, ProductName: 'Quần Short Gym', Name: 'Quần Short Gym', Category: 'Clothing', Price: 220000, Stock: 25, Description: 'Quần short thể thao', Status: 'Còn hàng' },
+    { ProductID: 6, ID: 6, ProductName: 'Găng Tay Gym', Name: 'Găng Tay Gym', Category: 'Accessory', Price: 180000, Stock: 20, Description: 'Găng tay hỗ trợ tập luyện', Status: 'Còn hàng' },
+    { ProductID: 7, ID: 7, ProductName: 'Bình Nước Gym', Name: 'Bình Nước Gym', Category: 'Accessory', Price: 120000, Stock: 35, Description: 'Bình nước thể thao 750ml', Status: 'Còn hàng' },
+    { ProductID: 8, ID: 8, ProductName: 'Nước Suối', Name: 'Nước Suối', Category: 'Beverage', Price: 15000, Stock: 100, Description: 'Nước suối đóng chai', Status: 'Còn hàng' }
   ],
 
   // 14. Bảng salaries (Khớp 100% Figma Prototype)
   salaries: [
-    { ID: 1, Code: 'NV102', Name: 'Trần Quốc Bảo', Role: 'Trainer (FT)', WorkDays: '26/26', Sessions: 42, LateDays: 0, BaseSalary: 8000000, Allowance: 8400000, TotalSalary: 16400000, Status: 'Đã duyệt' },
-    { ID: 2, Code: 'NV105', Name: 'Nguyễn Thị Yến', Role: 'Trainer (PT)', WorkDays: '20/26', Sessions: 36, LateDays: 2, BaseSalary: 4500000, Allowance: 7200000, TotalSalary: 11700000, Status: 'Đã duyệt' },
-    { ID: 3, Code: 'NV108', Name: 'Lê Đức Mạnh', Role: 'Trainer (FT)', WorkDays: '26/26', Sessions: 34, LateDays: 1, BaseSalary: 8000000, Allowance: 6800000, TotalSalary: 14800000, Status: 'Đã duyệt' },
-    { ID: 4, Code: 'NV201', Name: 'Phạm Anh Tuấn', Role: 'Staff', WorkDays: '24/26', Sessions: 0, LateDays: 4, BaseSalary: 6500000, Allowance: 300000, TotalSalary: 6800000, Status: 'Đã duyệt' },
-    { ID: 5, Code: 'NV110', Name: 'Võ Minh Tâm', Role: 'Trainer (FT)', WorkDays: '25/26', Sessions: 27, LateDays: 0, BaseSalary: 8000000, Allowance: 5400000, TotalSalary: 13400000, Status: 'Đã duyệt' },
-    { ID: 6, Code: 'NV112', Name: 'Lâm Thế Vinh', Role: 'Trainer (PT)', WorkDays: '18/26', Sessions: 12, LateDays: 0, BaseSalary: 4500000, Allowance: 2400000, TotalSalary: 6900000, Status: 'Đã duyệt' }
+    { ID: 1, Code: 'NV102', Name: 'Trần Quốc Bảo', Role: 'Trainer (FT)', WorkDays: '26/26', Sessions: 42, LateDays: 0, BaseSalary: 8000000, Allowance: 8400000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 16400000, Status: 'Đã duyệt' },
+    { ID: 2, Code: 'NV105', Name: 'Nguyễn Thị Yến', Role: 'Trainer (PT)', WorkDays: '20/26', Sessions: 36, LateDays: 2, BaseSalary: 4500000, Allowance: 7200000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 11700000, Status: 'Đã duyệt' },
+    { ID: 3, Code: 'NV108', Name: 'Lê Đức Mạnh', Role: 'Trainer (FT)', WorkDays: '26/26', Sessions: 34, LateDays: 1, BaseSalary: 8000000, Allowance: 6800000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 14800000, Status: 'Đã duyệt' },
+    { ID: 4, Code: 'NV201', Name: 'Phạm Anh Tuấn', Role: 'Staff', WorkDays: '24/26', Sessions: 0, LateDays: 4, BaseSalary: 6500000, Allowance: 300000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 6800000, Status: 'Đã duyệt' },
+    { ID: 5, Code: 'NV110', Name: 'Võ Minh Tâm', Role: 'Trainer (FT)', WorkDays: '25/26', Sessions: 27, LateDays: 0, BaseSalary: 8000000, Allowance: 5400000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 13400000, Status: 'Đã duyệt' },
+    { ID: 6, Code: 'NV112', Name: 'Lâm Thế Vinh', Role: 'Trainer (PT)', WorkDays: '18/26', Sessions: 12, LateDays: 0, BaseSalary: 4500000, Allowance: 2400000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 6900000, Status: 'Đã duyệt' }
   ]
 };
 

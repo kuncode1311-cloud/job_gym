@@ -84,10 +84,11 @@
 
                 <!-- Filter Tabs -->
                 <div class="filter-tabs" id="staffPosTabs">
-                  <button class="tab-btn active" onclick="filterStaffPos('all', event)">Tất cả</button>
-                  <button class="tab-btn" onclick="filterStaffPos('Đồ uống', event)">Đồ uống</button>
-                  <button class="tab-btn" onclick="filterStaffPos('Phụ kiện', event)">Phụ kiện</button>
-                  <button class="tab-btn" onclick="filterStaffPos('Dịch vụ', event)">Dịch vụ</button>
+                  <button class="tab-btn active" onclick="filterStaffPos('all', event)">Tất cả (8)</button>
+                  <button class="tab-btn" onclick="filterStaffPos('Supplement', event)">Thực phẩm bổ sung</button>
+                  <button class="tab-btn" onclick="filterStaffPos('Clothing', event)">Trang phục tập</button>
+                  <button class="tab-btn" onclick="filterStaffPos('Accessory', event)">Phụ kiện</button>
+                  <button class="tab-btn" onclick="filterStaffPos('Beverage', event)">Đồ uống</button>
                 </div>
               </div>
 
@@ -96,19 +97,19 @@
                 <table class="custom-table">
                   <thead>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.12);">
-                      <th style="color: #FF334B; font-weight: 700; min-width: 170px;">Tên sản phẩm / Dịch vụ</th>
-                      <th style="color: #FF334B; font-weight: 700; width: 120px; text-align: center;">Phân loại</th>
-                      <th style="color: #FF334B; font-weight: 700; width: 110px;">Đơn giá</th>
+                      <th style="color: #FF334B; font-weight: 700; min-width: 170px;">Tên sản phẩm</th>
+                      <th style="color: #FF334B; font-weight: 700; width: 140px; text-align: center;">Phân loại</th>
+                      <th style="color: #FF334B; font-weight: 700; width: 120px;">Đơn giá</th>
                       <th style="color: #FF334B; font-weight: 700; width: 100px; text-align: center;">Tồn kho</th>
                       <th style="color: #FF334B; font-weight: 700; width: 130px; text-align: center;">Thao tác</th>
                     </tr>
                   </thead>
                   <tbody id="staffPosTableBody">
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Nước protein shake</td>
-                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-blue">Đồ uống</span></td>
-                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">45.000đ</td>
-                      <td style="color: #10B981; font-weight: 700; padding: 14px 16px; text-align: center;">85 chai</td>
+                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Whey Protein</td>
+                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-blue">Supplement</span></td>
+                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">850.000đ</td>
+                      <td style="color: #10B981; font-weight: 700; padding: 14px 16px; text-align: center;">20</td>
                       <td style="text-align: center; padding: 14px 16px;">
                         <button class="btn btn-primary btn-sm" style="font-weight: 700;" onclick="handleStaffQuickSell(1)">
                           <i class="fa fa-shopping-cart"></i> Bán ngay
@@ -116,10 +117,10 @@
                       </td>
                     </tr>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Nước BCAA chanh tuyết</td>
-                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-blue">Đồ uống</span></td>
-                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">35.000đ</td>
-                      <td style="color: #10B981; font-weight: 700; padding: 14px 16px; text-align: center;">60 chai</td>
+                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Mass Gainer</td>
+                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-blue">Supplement</span></td>
+                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">720.000đ</td>
+                      <td style="color: #10B981; font-weight: 700; padding: 14px 16px; text-align: center;">15</td>
                       <td style="text-align: center; padding: 14px 16px;">
                         <button class="btn btn-primary btn-sm" style="font-weight: 700;" onclick="handleStaffQuickSell(2)">
                           <i class="fa fa-shopping-cart"></i> Bán ngay
@@ -127,21 +128,21 @@
                       </td>
                     </tr>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Khăn tập Microfiber</td>
-                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-yellow">Phụ kiện</span></td>
-                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">50.000đ</td>
-                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-red">Hết hàng (0)</span></td>
+                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Pre Workout</td>
+                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-blue">Supplement</span></td>
+                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">450.000đ</td>
+                      <td style="color: #10B981; font-weight: 700; padding: 14px 16px; text-align: center;">10</td>
                       <td style="text-align: center; padding: 14px 16px;">
-                        <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.5; cursor: not-allowed; font-weight: 600;">
-                          <i class="fa fa-ban"></i> Hết hàng
+                        <button class="btn btn-primary btn-sm" style="font-weight: 700;" onclick="handleStaffQuickSell(3)">
+                          <i class="fa fa-shopping-cart"></i> Bán ngay
                         </button>
                       </td>
                     </tr>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Bao tay tập gym Pro</td>
-                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-yellow">Phụ kiện</span></td>
-                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">120.000đ</td>
-                      <td style="color: #10B981; font-weight: 700; padding: 14px 16px; text-align: center;">24 đôi</td>
+                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Áo Gym</td>
+                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-yellow">Clothing</span></td>
+                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">250.000đ</td>
+                      <td style="color: #10B981; font-weight: 700; padding: 14px 16px; text-align: center;">30</td>
                       <td style="text-align: center; padding: 14px 16px;">
                         <button class="btn btn-primary btn-sm" style="font-weight: 700;" onclick="handleStaffQuickSell(4)">
                           <i class="fa fa-shopping-cart"></i> Bán ngay
@@ -149,23 +150,12 @@
                       </td>
                     </tr>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Personal training 1 buổi</td>
-                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-red">Dịch vụ</span></td>
-                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">200.000đ</td>
-                      <td style="color: #9CA3AF; padding: 14px 16px; text-align: center;">Sẵn sàng</td>
+                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Nước Suối</td>
+                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-green">Beverage</span></td>
+                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">15.000đ</td>
+                      <td style="color: #10B981; font-weight: 700; padding: 14px 16px; text-align: center;">100</td>
                       <td style="text-align: center; padding: 14px 16px;">
-                        <button class="btn btn-primary btn-sm" style="font-weight: 700;" onclick="handleStaffQuickSell(5)">
-                          <i class="fa fa-shopping-cart"></i> Bán ngay
-                        </button>
-                      </td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
-                      <td style="font-weight: 700; color: #FFFFFF; padding: 14px 16px;">Massage giãn cơ sau tập</td>
-                      <td style="padding: 14px 16px; text-align: center;"><span class="badge badge-red">Dịch vụ</span></td>
-                      <td style="color: #FF334B; font-weight: 800; padding: 14px 16px;">150.000đ</td>
-                      <td style="color: #9CA3AF; padding: 14px 16px; text-align: center;">Sẵn sàng</td>
-                      <td style="text-align: center; padding: 14px 16px;">
-                        <button class="btn btn-primary btn-sm" style="font-weight: 700;" onclick="handleStaffQuickSell(6)">
+                        <button class="btn btn-primary btn-sm" style="font-weight: 700;" onclick="handleStaffQuickSell(8)">
                           <i class="fa fa-shopping-cart"></i> Bán ngay
                         </button>
                       </td>
@@ -174,6 +164,7 @@
                 </table>
               </div>
             </div>
+
 
 
 
