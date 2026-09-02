@@ -566,11 +566,15 @@ const GymAPI = {
    */
   async getStaffAttendance(userId = null, monthYear = null) {
     const db = MockDB.getDB();
-    let records = (db && db.staff_attendance && db.staff_attendance.length > 0) ? db.staff_attendance : DEFAULT_DATABASE.staff_attendance;
+    if (!db.staff_attendance || db.staff_attendance.length === 0) {
+      db.staff_attendance = JSON.parse(JSON.stringify(DEFAULT_DATABASE.staff_attendance || []));
+      MockDB.saveDB(db);
+    }
+    let records = db.staff_attendance;
     if (userId) {
       records = records.filter(r => r.UserID === Number(userId));
     }
-    if (monthYear) {
+    if (monthYear && monthYear !== 'all') {
       records = records.filter(r => r.ShiftDate && r.ShiftDate.startsWith(monthYear));
     }
     return records;
@@ -581,7 +585,9 @@ const GymAPI = {
    */
   async checkInStaff(data) {
     const db = MockDB.getDB();
-    if (!db.staff_attendance) db.staff_attendance = [...(DEFAULT_DATABASE.staff_attendance || [])];
+    if (!db.staff_attendance) {
+      db.staff_attendance = JSON.parse(JSON.stringify(DEFAULT_DATABASE.staff_attendance || []));
+    }
     
     const newId = db.staff_attendance.length > 0 ? Math.max(...db.staff_attendance.map(r => r.AttendanceStaffID || 0)) + 1 : 1;
     const now = new Date();
@@ -610,25 +616,30 @@ const GymAPI = {
   /**
    * Nhân viên bấm Check-out kết thúc ca làm việc
    */
-  async checkOutStaff(attendanceId) {
+  async checkOutStaff(attendanceId = null) {
     const db = MockDB.getDB();
-    if (!db.staff_attendance) return { success: false, message: 'Chưa có dữ liệu' };
+    if (!db.staff_attendance || db.staff_attendance.length === 0) {
+      return { success: false, message: 'Chưa có dữ liệu' };
+    }
 
-    const index = db.staff_attendance.findIndex(r => r.AttendanceStaffID === Number(attendanceId));
-    if (index === -1) return { success: false, message: 'Không tìm thấy ca làm việc' };
+    let record = null;
+    if (attendanceId) {
+      record = db.staff_attendance.find(r => r.AttendanceStaffID === Number(attendanceId));
+    }
+    if (!record) {
+      record = db.staff_attendance.find(r => !r.CheckOutTime);
+    }
+    if (!record) return { success: false, message: 'Không tìm thấy ca làm việc đang mở' };
 
     const now = new Date();
     const timeStr = now.toTimeString().split(' ')[0];
-    
-    // Tính tổng giờ làm
-    const record = db.staff_attendance[index];
     record.CheckOutTime = timeStr;
 
-    // Giả định tính khoảng cách giờ
-    const checkInParts = record.CheckInTime.split(':').map(Number);
-    const checkOutParts = timeStr.split(':').map(Number);
-    const diffHours = (checkOutParts[0] + checkOutParts[1] / 60) - (checkInParts[0] + checkInParts[1] / 60);
-    record.WorkHours = diffHours > 0 ? Number(diffHours.toFixed(2)) : 8.00;
+    // Tính khoảng cách giờ thực tế
+    const inParts = record.CheckInTime.split(':').map(Number);
+    const outParts = timeStr.split(':').map(Number);
+    const diffHours = (outParts[0] + outParts[1] / 60) - (inParts[0] + inParts[1] / 60);
+    record.WorkHours = diffHours > 0.05 ? Number(diffHours.toFixed(2)) : 8.00;
 
     MockDB.saveDB(db);
     return { success: true, data: record };

@@ -1570,7 +1570,7 @@ function startStaffRealtimeClock() {
 async function loadStaffAttendanceData() {
   const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { UserID: 8, Fullname: 'Lâm Văn Cường' };
   const monthSelect = document.getElementById('staffAttMonthSelect');
-  const month = monthSelect ? monthSelect.value : '2026-08';
+  const month = monthSelect ? monthSelect.value : 'all';
 
   const empNameEl = document.getElementById('staffTodayEmpName');
   if (empNameEl) empNameEl.textContent = `${currentUser.Fullname || 'Lâm Văn Cường'} (NV201)`;
@@ -1587,7 +1587,7 @@ async function loadStaffAttendanceData() {
 
   if (tableBody) {
     if (records.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #9CA3AF; padding: 24px;">Chưa có dữ liệu chấm công cho tháng ${month}</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #9CA3AF; padding: 24px;">Chưa có dữ liệu chấm công cho bộ lọc này</td></tr>`;
     } else {
       tableBody.innerHTML = records.map(r => {
         let statusBadge = '';
@@ -1695,7 +1695,7 @@ async function handleStaffRealtimeCheckIn() {
   });
 
   showToast(`✓ Check-in vào ca thành công lúc ${timeStr}!`, 'success');
-  loadStaffAttendanceData();
+  await loadStaffAttendanceData();
 }
 
 async function handleStaffRealtimeCheckOut() {
@@ -1711,11 +1711,12 @@ async function handleStaffRealtimeCheckOut() {
   const result = await GymAPI.checkOutStaff(activeRecord.AttendanceStaffID);
   if (result.success) {
     showToast(`✓ Check-out tan ca thành công! Tổng số giờ làm: ${result.data.WorkHours} giờ.`, 'success');
-    loadStaffAttendanceData();
+    await loadStaffAttendanceData();
   } else {
     showToast(result.message || 'Lỗi khi check-out!', 'error');
   }
 }
+
 
 function handleStaffLeaveSubmit(e) {
   e.preventDefault();
