@@ -153,6 +153,17 @@ const DEFAULT_DATABASE = {
     { ID: 4, Code: 'NV201', Name: 'Phạm Anh Tuấn', Role: 'Staff', WorkDays: '24/26', Sessions: 0, LateDays: 4, BaseSalary: 6500000, Allowance: 300000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 6800000, Status: 'Đã duyệt' },
     { ID: 5, Code: 'NV110', Name: 'Võ Minh Tâm', Role: 'Trainer (FT)', WorkDays: '25/26', Sessions: 27, LateDays: 0, BaseSalary: 8000000, Allowance: 5400000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 13400000, Status: 'Đã duyệt' },
     { ID: 6, Code: 'NV112', Name: 'Lâm Thế Vinh', Role: 'Trainer (PT)', WorkDays: '18/26', Sessions: 12, LateDays: 0, BaseSalary: 4500000, Allowance: 2400000, Bonus: 0, Deduction: 0, Note: '', TotalSalary: 6900000, Status: 'Đã duyệt' }
+  ],
+
+  // 15. Bảng staff_attendance (Chấm công nhân viên & HLV chuẩn MySQL)
+  staff_attendance: [
+    { AttendanceStaffID: 1, UserID: 8, StaffCode: 'NV201', StaffName: 'Lâm Văn Cường', ShiftDate: '2026-08-31', ShiftName: 'Ca Sáng (06:00 - 14:00)', CheckInTime: '05:55:00', CheckOutTime: '14:05:00', WorkHours: 8.15, Status: 'OnTime', Note: 'Đúng giờ' },
+    { AttendanceStaffID: 2, UserID: 8, StaffCode: 'NV201', StaffName: 'Lâm Văn Cường', ShiftDate: '2026-08-30', ShiftName: 'Ca Sáng (06:00 - 14:00)', CheckInTime: '06:12:00', CheckOutTime: '14:00:00', WorkHours: 7.80, Status: 'Late', Note: 'Đi trễ 12p do kẹt xe' },
+    { AttendanceStaffID: 3, UserID: 8, StaffCode: 'NV201', StaffName: 'Lâm Văn Cường', ShiftDate: '2026-08-29', ShiftName: 'Ca Sáng (06:00 - 14:00)', CheckInTime: '05:58:00', CheckOutTime: '14:00:00', WorkHours: 8.00, Status: 'OnTime', Note: 'Đúng giờ' },
+    { AttendanceStaffID: 4, UserID: 8, StaffCode: 'NV201', StaffName: 'Lâm Văn Cường', ShiftDate: '2026-08-28', ShiftName: 'Ca Chiều (14:00 - 22:00)', CheckInTime: '13:50:00', CheckOutTime: '22:05:00', WorkHours: 8.25, Status: 'OnTime', Note: 'Tăng ca kiểm kho' },
+    { AttendanceStaffID: 5, UserID: 8, StaffCode: 'NV201', StaffName: 'Lâm Văn Cường', ShiftDate: '2026-08-27', ShiftName: 'Ca Sáng (06:00 - 14:00)', CheckInTime: '05:52:00', CheckOutTime: '14:00:00', WorkHours: 8.10, Status: 'OnTime', Note: 'Đúng giờ' },
+    { AttendanceStaffID: 6, UserID: 8, StaffCode: 'NV201', StaffName: 'Lâm Văn Cường', ShiftDate: '2026-08-26', ShiftName: 'Ca Sáng (06:00 - 14:00)', CheckInTime: '05:50:00', CheckOutTime: '14:00:00', WorkHours: 8.15, Status: 'OnTime', Note: 'Đúng giờ' },
+    { AttendanceStaffID: 7, UserID: 8, StaffCode: 'NV201', StaffName: 'Lâm Văn Cường', ShiftDate: '2026-08-25', ShiftName: 'Ca Sáng (06:00 - 14:00)', CheckInTime: '05:56:00', CheckOutTime: '14:00:00', WorkHours: 8.05, Status: 'OnTime', Note: 'Đúng giờ' }
   ]
 };
 

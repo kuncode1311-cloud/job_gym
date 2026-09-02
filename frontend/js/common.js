@@ -215,11 +215,13 @@ function initSidebarNavigation() {
       { name: 'Hội viên', link: 'member.html', icon: 'fa-user-friends' },
       { name: 'Thanh toán', link: 'admin.html#payments', icon: 'fa-file-invoice-dollar' },
       { name: 'Kho hàng', link: 'admin.html#inventory', icon: 'fa-boxes' },
-      { name: 'Điểm danh', link: 'admin.html#attendance_manage', icon: 'fa-calendar-check' },
+      { name: 'Chấm công ca trực', link: 'admin.html#staff_attendance', icon: 'fa-user-clock' },
+      { name: 'Điểm danh hội viên', link: 'admin.html#attendance_manage', icon: 'fa-calendar-check' },
       { name: 'Booking', link: 'trainer.html#bookings', icon: 'fa-calendar-alt' },
       { name: 'Feedback từ Khách', link: 'trainer.html#feedbacks', icon: 'fa-star' },
       { name: 'Lương cá nhân', link: 'admin.html#my_salary', icon: 'fa-wallet' }
     ];
+
 
   } else if (currentUser.Role === 'Trainer') {
     menuItems = [

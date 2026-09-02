@@ -49,6 +49,9 @@ function switchAdminTab(tabId) {
     loadPayments();
   } else if (tabId === 'inventory') {
     loadInventory();
+  } else if (tabId === 'staff_attendance') {
+    loadStaffAttendanceData();
+    startStaffRealtimeClock();
   } else if (tabId === 'attendance_manage' || tabId === 'my_attendance') {
     loadStaffAttendance();
   } else if (tabId === 'salaries') {
@@ -60,6 +63,7 @@ function switchAdminTab(tabId) {
   } else if (tabId === 'reports') {
     setTimeout(initReportChart, 100);
   }
+
 
   if (typeof initSidebarNavigation === 'function') {
     initSidebarNavigation();
@@ -1529,8 +1533,312 @@ function exportReportToExcel() {
   showToast('Xuất báo cáo Excel thành công!', 'success');
 }
 
+// ==============================================================================
+// PHÂN HỆ CHẤM CÔNG CA TRỰC NHÂN VIÊN (STAFF ATTENDANCE)
+// ==============================================================================
 
+let staffClockInterval = null;
 
+function startStaffRealtimeClock() {
+  if (staffClockInterval) clearInterval(staffClockInterval);
+
+  function updateClock() {
+    const clockEl = document.getElementById('staffRealtimeClock');
+    const dateEl = document.getElementById('staffRealtimeDate');
+    if (!clockEl) return;
+
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+
+    if (dateEl) {
+      const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+      const dayName = days[now.getDay()];
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      dateEl.textContent = `Hôm nay, ${dayName} ${day}/${month}/${year}`;
+    }
+  }
+
+  updateClock();
+  staffClockInterval = setInterval(updateClock, 1000);
+}
+
+async function loadStaffAttendanceData() {
+  const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { UserID: 8, Fullname: 'Lâm Văn Cường' };
+  const monthSelect = document.getElementById('staffAttMonthSelect');
+  const month = monthSelect ? monthSelect.value : '2026-08';
+
+  const empNameEl = document.getElementById('staffTodayEmpName');
+  if (empNameEl) empNameEl.textContent = `${currentUser.Fullname || 'Lâm Văn Cường'} (NV201)`;
+
+  const records = await GymAPI.getStaffAttendance(currentUser.UserID, month);
+
+  // Render Table Rows
+  const tableBody = document.getElementById('staffAttTableBody');
+  const recordCountEl = document.getElementById('staffAttRecordCount');
+
+  if (recordCountEl) {
+    recordCountEl.textContent = `Hiển thị ${records.length} ca làm việc`;
+  }
+
+  if (tableBody) {
+    if (records.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #9CA3AF; padding: 24px;">Chưa có dữ liệu chấm công cho tháng ${month}</td></tr>`;
+    } else {
+      tableBody.innerHTML = records.map(r => {
+        let statusBadge = '';
+        if (r.Status === 'OnTime') {
+          statusBadge = '<span class="badge badge-green" style="padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 12px;"><i class="fa fa-check-circle"></i> Đúng giờ</span>';
+        } else if (r.Status === 'Late') {
+          statusBadge = '<span class="badge badge-yellow" style="padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 12px; background: rgba(245,158,11,0.15); color: #F59E0B;"><i class="fa fa-clock"></i> Đi muộn</span>';
+        } else {
+          statusBadge = '<span class="badge badge-red" style="padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 12px;"><i class="fa fa-exclamation-triangle"></i> Về sớm</span>';
+        }
+
+        return `
+          <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+            <td style="font-weight: 700; color: #FFFFFF; padding: 14px 18px;">#${r.AttendanceStaffID}</td>
+            <td style="color: #FFFFFF; font-weight: 600; padding: 14px 18px;">${formatDate(r.ShiftDate)}</td>
+            <td style="color: #3B82F6; font-weight: 700; padding: 14px 18px;">${r.ShiftName || 'Ca Sáng (06:00 - 14:00)'}</td>
+            <td style="color: #10B981; font-weight: 700; padding: 14px 18px;">${r.CheckInTime}</td>
+            <td style="color: ${r.CheckOutTime ? '#E5E7EB' : '#9CA3AF'}; padding: 14px 18px;">${r.CheckOutTime || '—'}</td>
+            <td style="font-weight: 700; color: #FFFFFF; text-align: center; padding: 14px 18px;">${r.WorkHours ? r.WorkHours + 'h' : '8.0h'}</td>
+            <td style="padding: 14px 18px;">${statusBadge}</td>
+            <td style="color: #9CA3AF; padding: 14px 18px;">${r.Note || '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  // Update Today Status Card
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayRecord = records.find(r => r.ShiftDate === todayStr || r.ShiftDate === '2026-08-31');
+
+  const statusBadgeEl = document.getElementById('staffTodayStatusBadge');
+  const inTimeEl = document.getElementById('staffTodayInTime');
+  const outTimeEl = document.getElementById('staffTodayOutTime');
+  const btnIn = document.getElementById('btnStaffCheckIn');
+  const btnOut = document.getElementById('btnStaffCheckOut');
+
+  if (todayRecord) {
+    if (inTimeEl) inTimeEl.textContent = todayRecord.CheckInTime;
+    if (outTimeEl) outTimeEl.textContent = todayRecord.CheckOutTime || 'Chưa check-out';
+
+    if (todayRecord.CheckOutTime) {
+      if (statusBadgeEl) {
+        statusBadgeEl.className = 'badge badge-green';
+        statusBadgeEl.innerHTML = `<i class="fa fa-check-double"></i> Đã hoàn thành ca (${todayRecord.WorkHours}h)`;
+      }
+      if (btnIn) { btnIn.disabled = true; btnIn.style.opacity = '0.5'; }
+      if (btnOut) { btnOut.disabled = true; btnOut.style.opacity = '0.5'; }
+    } else {
+      if (statusBadgeEl) {
+        statusBadgeEl.className = 'badge badge-green';
+        statusBadgeEl.innerHTML = `<i class="fa fa-check-circle"></i> Đang trong ca (Vào lúc ${todayRecord.CheckInTime})`;
+      }
+      if (btnIn) { btnIn.disabled = true; btnIn.style.opacity = '0.5'; }
+      if (btnOut) { btnOut.disabled = false; btnOut.style.opacity = '1'; }
+    }
+  } else {
+    if (inTimeEl) inTimeEl.textContent = 'Chưa check-in';
+    if (outTimeEl) outTimeEl.textContent = '—';
+    if (statusBadgeEl) {
+      statusBadgeEl.className = 'badge badge-yellow';
+      statusBadgeEl.innerHTML = '<i class="fa fa-hourglass-start"></i> Chưa vào ca';
+    }
+    if (btnIn) { btnIn.disabled = false; btnIn.style.opacity = '1'; }
+    if (btnOut) { btnOut.disabled = true; btnOut.style.opacity = '0.5'; }
+  }
+
+  // Calculate & Update KPIs
+  const workDays = records.length;
+  const totalHours = records.reduce((acc, cur) => acc + (Number(cur.WorkHours) || 8), 0).toFixed(1);
+  const lateCount = records.filter(r => r.Status === 'Late').length;
+
+  const kpiWorkDaysEl = document.getElementById('staffKpiWorkDays');
+  const kpiHoursEl = document.getElementById('staffKpiWorkHours');
+  const kpiLateEl = document.getElementById('staffKpiLateDays');
+  const kpiAllowanceEl = document.getElementById('staffKpiAllowance');
+
+  if (kpiWorkDaysEl) kpiWorkDaysEl.textContent = `${workDays} / 26 Ngày`;
+  if (kpiHoursEl) kpiHoursEl.textContent = `${totalHours} Giờ`;
+  if (kpiLateEl) kpiLateEl.textContent = `${lateCount} Lần`;
+  if (kpiAllowanceEl) kpiAllowanceEl.textContent = lateCount <= 1 ? '+500.000đ' : '0đ';
+}
+
+async function handleStaffRealtimeCheckIn() {
+  const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { UserID: 8, Fullname: 'Lâm Văn Cường' };
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0];
+  const dateStr = now.toISOString().split('T')[0];
+
+  const isLate = now.getHours() > 6 || (now.getHours() === 6 && now.getMinutes() > 15);
+
+  await GymAPI.checkInStaff({
+    UserID: currentUser.UserID || 8,
+    StaffName: currentUser.Fullname || 'Lâm Văn Cường',
+    StaffCode: 'NV201',
+    ShiftDate: dateStr,
+    ShiftName: 'Ca Sáng (06:00 - 14:00)',
+    CheckInTime: timeStr,
+    Status: isLate ? 'Late' : 'OnTime',
+    Note: isLate ? 'Đi muộn ca sáng' : 'Đúng giờ'
+  });
+
+  showToast(`✓ Check-in vào ca thành công lúc ${timeStr}!`, 'success');
+  loadStaffAttendanceData();
+}
+
+async function handleStaffRealtimeCheckOut() {
+  const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { UserID: 8, Fullname: 'Lâm Văn Cường' };
+  const records = await GymAPI.getStaffAttendance(currentUser.UserID);
+  const activeRecord = records.find(r => !r.CheckOutTime);
+
+  if (!activeRecord) {
+    showToast('Bạn chưa có ca làm việc nào đang mở để check-out!', 'error');
+    return;
+  }
+
+  const result = await GymAPI.checkOutStaff(activeRecord.AttendanceStaffID);
+  if (result.success) {
+    showToast(`✓ Check-out tan ca thành công! Tổng số giờ làm: ${result.data.WorkHours} giờ.`, 'success');
+    loadStaffAttendanceData();
+  } else {
+    showToast(result.message || 'Lỗi khi check-out!', 'error');
+  }
+}
+
+function handleStaffLeaveSubmit(e) {
+  e.preventDefault();
+  const type = document.getElementById('leaveType').value;
+  const date = document.getElementById('leaveDate').value;
+  const shift = document.getElementById('leaveShift').value;
+  const reason = document.getElementById('leaveReason').value.trim();
+
+  if (!date || !reason) {
+    showToast('Vui lòng điền đầy đủ ngày áp dụng và lý do!', 'error');
+    return;
+  }
+
+  closeModal('staffLeaveModal');
+  showToast('✓ Đã gửi đơn thành công! Quản lý sẽ xét duyệt trong thời gian sớm nhất.', 'success');
+}
+
+async function exportStaffAttendanceExcel() {
+  const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { UserID: 8, Fullname: 'Lâm Văn Cường' };
+  const monthSelect = document.getElementById('staffAttMonthSelect');
+  const month = monthSelect ? monthSelect.value : '2026-08';
+  const records = await GymAPI.getStaffAttendance(currentUser.UserID, month);
+
+  const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center" ss:WrapText="0"/>
+   <Font ss:FontName="Segoe UI" ss:Size="11" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="sTitle">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="16" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#1E1624" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sHeader">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#FF334B" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CCCCCC"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CCCCCC"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CCCCCC"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CCCCCC"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="sRowEven">
+   <Alignment ss:Vertical="Center"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="sRowOdd">
+   <Alignment ss:Vertical="Center"/>
+   <Interior ss:Color="#F9FAFB" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+   </Borders>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Bang_Cham_Cong">
+  <Table ss:DefaultRowHeight="20">
+   <Column ss:Width="80"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="160"/>
+   <Column ss:Width="160"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="100"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="160"/>
+   <Row ss:Height="35">
+    <Cell ss:MergeAcross="8" ss:StyleID="sTitle"><Data ss:Type="String">BẢNG CHẤM CÔNG CA TRỰC NHÂN VIÊN - ${month.toUpperCase()}</Data></Cell>
+   </Row>
+   <Row ss:Height="25">
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Mã Công</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Mã NV</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Họ và Tên</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Ca Phân Công</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Ngày Làm</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Giờ Vào</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Giờ Ra</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Số Giờ</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">Trạng Thái</Data></Cell>
+   </Row>
+   ${records.map((r, idx) => {
+     const style = (idx % 2 === 0) ? 'sRowEven' : 'sRowOdd';
+     return `
+   <Row ss:Height="22">
+    <Cell ss:StyleID="${style}"><Data ss:Type="Number">${r.AttendanceStaffID}</Data></Cell>
+    <Cell ss:StyleID="${style}"><Data ss:Type="String">${r.StaffCode || 'NV201'}</Data></Cell>
+    <Cell ss:StyleID="${style}"><Data ss:Type="String">${r.StaffName || 'Lâm Văn Cường'}</Data></Cell>
+    <Cell ss:StyleID="${style}"><Data ss:Type="String">${r.ShiftName || 'Ca Sáng'}</Data></Cell>
+    <Cell ss:StyleID="${style}"><Data ss:Type="String">${formatDate(r.ShiftDate)}</Data></Cell>
+    <Cell ss:StyleID="${style}"><Data ss:Type="String">${r.CheckInTime}</Data></Cell>
+    <Cell ss:StyleID="${style}"><Data ss:Type="String">${r.CheckOutTime || 'Chưa ra'}</Data></Cell>
+    <Cell ss:StyleID="${style}"><Data ss:Type="Number">${r.WorkHours || 8}</Data></Cell>
+    <Cell ss:StyleID="${style}"><Data ss:Type="String">${r.Status === 'OnTime' ? 'Đúng giờ' : 'Đi muộn'}</Data></Cell>
+   </Row>`;
+   }).join('')}
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+  const blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `Bang_Cham_Cong_Nhan_Vien_${month}.xls`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast('Xuất bảng chấm công Excel thành công!', 'success');
+}
 
 window.switchAdminTab = switchAdminTab;
 window.openAddPackageModal = openAddPackageModal;
@@ -1551,5 +1859,11 @@ window.toggleUserStatus = toggleUserStatus;
 window.loadMySalary = loadMySalary;
 window.loadReportsData = loadReportsData;
 window.exportReportToExcel = exportReportToExcel;
+window.loadStaffAttendanceData = loadStaffAttendanceData;
+window.handleStaffRealtimeCheckIn = handleStaffRealtimeCheckIn;
+window.handleStaffRealtimeCheckOut = handleStaffRealtimeCheckOut;
+window.handleStaffLeaveSubmit = handleStaffLeaveSubmit;
+window.exportStaffAttendanceExcel = exportStaffAttendanceExcel;
+
 
 

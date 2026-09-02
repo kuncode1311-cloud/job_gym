@@ -555,6 +555,83 @@ const GymAPI = {
     db.feedbacks.unshift(newFeedback);
     MockDB.saveDB(db);
     return { success: true, data: newFeedback };
+  },
+
+  // ============================================================================
+  // 10. NHÓM CHỨC NĂNG CHẤM CÔNG NHÂN VIÊN & HLV (STAFF ATTENDANCE)
+  // ============================================================================
+
+  /**
+   * Lấy lịch sử chấm công của Nhân viên / HLV
+   */
+  async getStaffAttendance(userId = null, monthYear = null) {
+    const db = MockDB.getDB();
+    let records = (db && db.staff_attendance && db.staff_attendance.length > 0) ? db.staff_attendance : DEFAULT_DATABASE.staff_attendance;
+    if (userId) {
+      records = records.filter(r => r.UserID === Number(userId));
+    }
+    if (monthYear) {
+      records = records.filter(r => r.ShiftDate && r.ShiftDate.startsWith(monthYear));
+    }
+    return records;
+  },
+
+  /**
+   * Nhân viên bấm Check-in vào ca làm việc
+   */
+  async checkInStaff(data) {
+    const db = MockDB.getDB();
+    if (!db.staff_attendance) db.staff_attendance = [...(DEFAULT_DATABASE.staff_attendance || [])];
+    
+    const newId = db.staff_attendance.length > 0 ? Math.max(...db.staff_attendance.map(r => r.AttendanceStaffID || 0)) + 1 : 1;
+    const now = new Date();
+    const timeStr = now.toTimeString().split(' ')[0]; // HH:MM:SS
+    const dateStr = now.toISOString().split('T')[0];
+
+    const newRecord = {
+      AttendanceStaffID: newId,
+      UserID: Number(data.UserID) || 8,
+      StaffCode: data.StaffCode || 'NV201',
+      StaffName: data.StaffName || 'Lâm Văn Cường',
+      ShiftDate: data.ShiftDate || dateStr,
+      ShiftName: data.ShiftName || 'Ca Sáng (06:00 - 14:00)',
+      CheckInTime: data.CheckInTime || timeStr,
+      CheckOutTime: null,
+      WorkHours: 0,
+      Status: data.Status || 'OnTime',
+      Note: data.Note || 'Check-in đúng giờ'
+    };
+
+    db.staff_attendance.unshift(newRecord);
+    MockDB.saveDB(db);
+    return { success: true, data: newRecord };
+  },
+
+  /**
+   * Nhân viên bấm Check-out kết thúc ca làm việc
+   */
+  async checkOutStaff(attendanceId) {
+    const db = MockDB.getDB();
+    if (!db.staff_attendance) return { success: false, message: 'Chưa có dữ liệu' };
+
+    const index = db.staff_attendance.findIndex(r => r.AttendanceStaffID === Number(attendanceId));
+    if (index === -1) return { success: false, message: 'Không tìm thấy ca làm việc' };
+
+    const now = new Date();
+    const timeStr = now.toTimeString().split(' ')[0];
+    
+    // Tính tổng giờ làm
+    const record = db.staff_attendance[index];
+    record.CheckOutTime = timeStr;
+
+    // Giả định tính khoảng cách giờ
+    const checkInParts = record.CheckInTime.split(':').map(Number);
+    const checkOutParts = timeStr.split(':').map(Number);
+    const diffHours = (checkOutParts[0] + checkOutParts[1] / 60) - (checkInParts[0] + checkInParts[1] / 60);
+    record.WorkHours = diffHours > 0 ? Number(diffHours.toFixed(2)) : 8.00;
+
+    MockDB.saveDB(db);
+    return { success: true, data: record };
   }
 };
 

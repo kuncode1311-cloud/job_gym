@@ -142,13 +142,37 @@ Tất cả các API đều giao tiếp bằng định dạng **JSON**. Dưới �
 
 ---
 
-### 6. Phân hệ Gói tập, Chấm công & Bảng lương
+### 6. Phân hệ Gói tập & Bảng lương
 - `GET /api/packages` : Danh sách các gói tập phòng Gym.
-- `GET /api/attendance` : Lịch sử điểm danh / chấm công nhân viên.
-- `POST /api/attendance` : Check-in ca làm việc.
 - `GET /api/salaries` : Bảng lương & thù lao hàng tháng.
+- `PUT /api/salaries/{id}` : Điều chỉnh lương, thưởng, phạt nhân sự.
 
 ---
+
+### 7. Phân hệ Chấm công Nhân viên & Ca trực (`/api/staff-attendance`)
+- `GET /api/staff-attendance?userId={id}&month={yyyy-mm}` : Lấy lịch sử chấm công theo nhân viên & tháng.
+- `POST /api/staff-attendance/check-in` : Ghi nhận nhân viên Check-in vào ca.
+- `POST /api/staff-attendance/check-out` : Ghi nhận nhân viên Check-out tan ca & tính giờ làm.
+
+*Mẫu dữ liệu chấm công nhân viên:*
+```json
+{
+  "AttendanceStaffID": 1,
+  "UserID": 8,
+  "StaffCode": "NV201",
+  "StaffName": "Lâm Văn Cường",
+  "ShiftDate": "2026-08-31",
+  "ShiftName": "Ca Sáng (06:00 - 14:00)",
+  "CheckInTime": "05:55:00",
+  "CheckOutTime": "14:05:00",
+  "WorkHours": 8.15,
+  "Status": "OnTime",
+  "Note": "Đúng giờ"
+}
+```
+
+---
+
 
 ## 📁 Cấu Trúc Thư Mục Dự Án
 

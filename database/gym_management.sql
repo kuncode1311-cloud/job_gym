@@ -250,7 +250,36 @@ INSERT INTO `salaries` (`SalaryID`, `Code`, `Name`, `Role`, `WorkDays`, `PTSessi
 (4, 'NV201', 'Lâm Văn Cường', 'Staff (Tiếp tân)', '26/26', 0, 0, 7000000.00, 800000.00, 7800000.00, '2026-08', 'Approved');
 
 -- --------------------------------------------------------
--- Bảng 10: `progress` (Theo dõi chỉ số InBody)
+-- Bảng 10: `staff_attendance` (Chấm công & Ca trực Nhân viên / HLV)
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `staff_attendance`;
+CREATE TABLE `staff_attendance` (
+  `AttendanceStaffID` int(11) NOT NULL AUTO_INCREMENT,
+  `UserID` int(11) NOT NULL,
+  `StaffCode` varchar(20) NOT NULL DEFAULT 'NV201',
+  `StaffName` varchar(100) NOT NULL,
+  `ShiftDate` date NOT NULL,
+  `ShiftName` varchar(50) DEFAULT 'Ca Sáng (06:00 - 14:00)',
+  `CheckInTime` time NOT NULL,
+  `CheckOutTime` time DEFAULT NULL,
+  `WorkHours` decimal(4,2) DEFAULT 8.00,
+  `Status` enum('OnTime','Late','EarlyLeave') NOT NULL DEFAULT 'OnTime',
+  `Note` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`AttendanceStaffID`),
+  KEY `fk_staff_attendance_users` (`UserID`),
+  CONSTRAINT `fk_staff_attendance_users` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `staff_attendance` (`AttendanceStaffID`, `UserID`, `StaffCode`, `StaffName`, `ShiftDate`, `ShiftName`, `CheckInTime`, `CheckOutTime`, `WorkHours`, `Status`, `Note`) VALUES
+(1, 8, 'NV201', 'Lâm Văn Cường', '2026-08-31', 'Ca Sáng (06:00 - 14:00)', '05:55:00', '14:05:00', 8.15, 'OnTime', 'Đúng giờ'),
+(2, 8, 'NV201', 'Lâm Văn Cường', '2026-08-30', 'Ca Sáng (06:00 - 14:00)', '06:12:00', '14:00:00', 7.80, 'Late', 'Đi trễ 12p do kẹt xe'),
+(3, 8, 'NV201', 'Lâm Văn Cường', '2026-08-29', 'Ca Sáng (06:00 - 14:00)', '05:58:00', '14:00:00', 8.00, 'OnTime', 'Đúng giờ'),
+(4, 8, 'NV201', 'Lâm Văn Cường', '2026-08-28', 'Ca Chiều (14:00 - 22:00)', '13:50:00', '22:05:00', 8.25, 'OnTime', 'Tăng ca kiểm kho'),
+(5, 8, 'NV201', 'Lâm Văn Cường', '2026-08-27', 'Ca Sáng (06:00 - 14:00)', '05:52:00', '14:00:00', 8.10, 'OnTime', 'Đúng giờ'),
+(6, 3, 'NV101', 'Nguyễn Minh Tuấn', '2026-08-31', 'Ca Sáng (07:00 - 15:00)', '06:50:00', '15:10:00', 8.30, 'OnTime', 'Dạy kèm PT 3 ca');
+
+-- --------------------------------------------------------
+-- Bảng 11: `progress` (Theo dõi chỉ số InBody)
 -- --------------------------------------------------------
 DROP TABLE IF EXISTS `progress`;
 CREATE TABLE `progress` (
