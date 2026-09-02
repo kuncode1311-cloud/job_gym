@@ -1859,19 +1859,15 @@ async function exportStaffAttendanceExcel() {
 }
 
 async function handleDeleteStaffAttendance(attendanceId) {
-  if (confirm('Bạn có chắc muốn xóa ca chấm công này không?')) {
-    await GymAPI.deleteStaffAttendance(attendanceId);
-    showToast('✓ Đã xóa ca chấm công thành công!', 'info');
-    await loadStaffAttendanceData();
-  }
+  await GymAPI.deleteStaffAttendance(attendanceId);
+  showToast('Đã xóa ca chấm công thành công!', 'info');
+  await loadStaffAttendanceData();
 }
 
 async function handleResetStaffAttendance() {
-  if (confirm('Bạn có muốn dọn dẹp các ca bấm thử và khôi phục về danh sách 7 ca chấm công mẫu chuẩn không?')) {
-    await GymAPI.resetStaffAttendance();
-    showToast('✓ Đã dọn dẹp và khôi phục dữ liệu gốc thành công!', 'success');
-    await loadStaffAttendanceData();
-  }
+  await GymAPI.resetStaffAttendance();
+  showToast('Đã dọn dẹp và khôi phục dữ liệu gốc thành công!', 'success');
+  await loadStaffAttendanceData();
 }
 
 window.switchAdminTab = switchAdminTab;
