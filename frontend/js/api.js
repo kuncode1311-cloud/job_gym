@@ -632,6 +632,9 @@ const GymAPI = {
     if (!record) return { success: false, message: 'Không tìm thấy ca làm việc đang mở' };
 
     const now = new Date();
+    const timeStr = now.toTimeString().split(' ')[0];
+    record.CheckOutTime = timeStr;
+
     // Tính khoảng cách thời gian thực tế chính xác (tính theo giây & giờ)
     const inParts = record.CheckInTime.split(':').map(Number);
     const outParts = timeStr.split(':').map(Number);
