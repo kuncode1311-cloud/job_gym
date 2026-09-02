@@ -8,6 +8,13 @@
 let currentInventoryCategory = 'all';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Đặt lại dữ liệu chấm công sạch sẽ mỗi lần F5 để dễ dàng test
+  if (typeof MockDB !== 'undefined' && typeof DEFAULT_DATABASE !== 'undefined') {
+    const db = MockDB.getDB();
+    db.staff_attendance = JSON.parse(JSON.stringify(DEFAULT_DATABASE.staff_attendance || []));
+    MockDB.saveDB(db);
+  }
+
   loadMySalary();
   initAdminTabsFromHash();
   window.addEventListener('hashchange', initAdminTabsFromHash);
@@ -19,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadSalaries();
   await loadUsers();
 });
+
 
 
 /**
