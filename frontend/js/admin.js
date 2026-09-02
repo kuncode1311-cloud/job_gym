@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 function initAdminTabsFromHash() {
   const hash = window.location.hash.replace('#', '');
-  const validTabs = ['packages', 'payments', 'inventory', 'attendance_manage', 'salaries', 'users', 'reports', 'my_salary', 'my_attendance'];
+  const validTabs = ['packages', 'payments', 'inventory', 'staff_attendance', 'attendance_manage', 'salaries', 'users', 'reports', 'my_salary', 'my_attendance'];
   
   if (validTabs.includes(hash)) {
     switchAdminTab(hash);
