@@ -1617,7 +1617,8 @@ async function loadStaffAttendanceData() {
 
   // Update Today Status Card
   const todayStr = new Date().toISOString().split('T')[0];
-  const todayRecord = records.find(r => r.ShiftDate === todayStr || r.ShiftDate === '2026-08-31');
+  const activeUncompletedShift = records.find(r => !r.CheckOutTime);
+  const todayRecord = activeUncompletedShift || records.find(r => r.ShiftDate === todayStr);
 
   const statusBadgeEl = document.getElementById('staffTodayStatusBadge');
   const inTimeEl = document.getElementById('staffTodayInTime');
@@ -1625,35 +1626,38 @@ async function loadStaffAttendanceData() {
   const btnIn = document.getElementById('btnStaffCheckIn');
   const btnOut = document.getElementById('btnStaffCheckOut');
 
-  if (todayRecord) {
-    if (inTimeEl) inTimeEl.textContent = todayRecord.CheckInTime;
-    if (outTimeEl) outTimeEl.textContent = todayRecord.CheckOutTime || 'Chưa check-out';
-
-    if (todayRecord.CheckOutTime) {
-      if (statusBadgeEl) {
-        statusBadgeEl.className = 'badge badge-green';
-        statusBadgeEl.innerHTML = `<i class="fa fa-check-double"></i> Đã hoàn thành ca (${todayRecord.WorkHours}h)`;
-      }
-      if (btnIn) { btnIn.disabled = true; btnIn.style.opacity = '0.5'; }
-      if (btnOut) { btnOut.disabled = true; btnOut.style.opacity = '0.5'; }
-    } else {
-      if (statusBadgeEl) {
-        statusBadgeEl.className = 'badge badge-green';
-        statusBadgeEl.innerHTML = `<i class="fa fa-check-circle"></i> Đang trong ca (Vào lúc ${todayRecord.CheckInTime})`;
-      }
-      if (btnIn) { btnIn.disabled = true; btnIn.style.opacity = '0.5'; }
-      if (btnOut) { btnOut.disabled = false; btnOut.style.opacity = '1'; }
+  if (activeUncompletedShift) {
+    // Đang trong ca làm việc -> Cho phép Check-out
+    if (inTimeEl) inTimeEl.textContent = activeUncompletedShift.CheckInTime;
+    if (outTimeEl) outTimeEl.textContent = 'Chưa check-out';
+    if (statusBadgeEl) {
+      statusBadgeEl.className = 'badge badge-green';
+      statusBadgeEl.innerHTML = `<i class="fa fa-check-circle"></i> Đang trong ca (Vào lúc ${activeUncompletedShift.CheckInTime})`;
     }
+    if (btnIn) { btnIn.disabled = true; btnIn.style.opacity = '0.5'; btnIn.style.cursor = 'not-allowed'; }
+    if (btnOut) { btnOut.disabled = false; btnOut.style.opacity = '1'; btnOut.style.cursor = 'pointer'; }
+  } else if (todayRecord && todayRecord.CheckOutTime) {
+    // Đã hoàn thành ca hôm nay -> Vẫn cho phép bấm Check-in ca mới nếu muốn
+    if (inTimeEl) inTimeEl.textContent = todayRecord.CheckInTime;
+    if (outTimeEl) outTimeEl.textContent = todayRecord.CheckOutTime;
+    if (statusBadgeEl) {
+      statusBadgeEl.className = 'badge badge-green';
+      statusBadgeEl.innerHTML = `<i class="fa fa-check-double"></i> Đã hoàn thành ca (${todayRecord.WorkHours}h)`;
+    }
+    if (btnIn) { btnIn.disabled = false; btnIn.style.opacity = '1'; btnIn.style.cursor = 'pointer'; }
+    if (btnOut) { btnOut.disabled = true; btnOut.style.opacity = '0.5'; btnOut.style.cursor = 'not-allowed'; }
   } else {
+    // Chưa vào ca -> Nút Check-in sáng để bấm
     if (inTimeEl) inTimeEl.textContent = 'Chưa check-in';
     if (outTimeEl) outTimeEl.textContent = '—';
     if (statusBadgeEl) {
       statusBadgeEl.className = 'badge badge-yellow';
       statusBadgeEl.innerHTML = '<i class="fa fa-hourglass-start"></i> Chưa vào ca';
     }
-    if (btnIn) { btnIn.disabled = false; btnIn.style.opacity = '1'; }
-    if (btnOut) { btnOut.disabled = true; btnOut.style.opacity = '0.5'; }
+    if (btnIn) { btnIn.disabled = false; btnIn.style.opacity = '1'; btnIn.style.cursor = 'pointer'; }
+    if (btnOut) { btnOut.disabled = true; btnOut.style.opacity = '0.5'; btnOut.style.cursor = 'not-allowed'; }
   }
+
 
   // Calculate & Update KPIs
   const workDays = records.length;
