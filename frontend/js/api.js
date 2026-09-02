@@ -643,6 +643,27 @@ const GymAPI = {
 
     MockDB.saveDB(db);
     return { success: true, data: record };
+  },
+
+  /**
+   * Xóa một ca chấm công (Dọn dẹp ca bấm nhầm / spam)
+   */
+  async deleteStaffAttendance(attendanceId) {
+    const db = MockDB.getDB();
+    if (!db.staff_attendance) return { success: false };
+    db.staff_attendance = db.staff_attendance.filter(r => r.AttendanceStaffID !== Number(attendanceId));
+    MockDB.saveDB(db);
+    return { success: true };
+  },
+
+  /**
+   * Đặt lại dữ liệu chấm công về mẫu chuẩn ban đầu
+   */
+  async resetStaffAttendance() {
+    const db = MockDB.getDB();
+    db.staff_attendance = JSON.parse(JSON.stringify(DEFAULT_DATABASE.staff_attendance || []));
+    MockDB.saveDB(db);
+    return { success: true, data: db.staff_attendance };
   }
 };
 

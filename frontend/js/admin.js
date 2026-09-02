@@ -1609,6 +1609,11 @@ async function loadStaffAttendanceData() {
             <td style="font-weight: 700; color: #FFFFFF; text-align: center; padding: 14px 18px;">${r.WorkHours ? r.WorkHours + 'h' : '8.0h'}</td>
             <td style="padding: 14px 18px;">${statusBadge}</td>
             <td style="color: #9CA3AF; padding: 14px 18px;">${r.Note || '—'}</td>
+            <td style="text-align: center; padding: 14px 18px;">
+              <button class="btn-action-icon" style="color: #EF4444; border-color: rgba(239,68,68,0.3);" title="Xóa ca này" onclick="handleDeleteStaffAttendance(${r.AttendanceStaffID})">
+                <i class="fa fa-trash-alt"></i>
+              </button>
+            </td>
           </tr>
         `;
       }).join('');
@@ -1845,6 +1850,22 @@ async function exportStaffAttendanceExcel() {
   showToast('Xuất bảng chấm công Excel thành công!', 'success');
 }
 
+async function handleDeleteStaffAttendance(attendanceId) {
+  if (confirm('Bạn có chắc muốn xóa ca chấm công này không?')) {
+    await GymAPI.deleteStaffAttendance(attendanceId);
+    showToast('✓ Đã xóa ca chấm công thành công!', 'info');
+    await loadStaffAttendanceData();
+  }
+}
+
+async function handleResetStaffAttendance() {
+  if (confirm('Bạn có muốn dọn dẹp các ca bấm thử và khôi phục về danh sách 7 ca chấm công mẫu chuẩn không?')) {
+    await GymAPI.resetStaffAttendance();
+    showToast('✓ Đã dọn dẹp và khôi phục dữ liệu gốc thành công!', 'success');
+    await loadStaffAttendanceData();
+  }
+}
+
 window.switchAdminTab = switchAdminTab;
 window.openAddPackageModal = openAddPackageModal;
 window.openEditPackageModal = openEditPackageModal;
@@ -1869,6 +1890,9 @@ window.handleStaffRealtimeCheckIn = handleStaffRealtimeCheckIn;
 window.handleStaffRealtimeCheckOut = handleStaffRealtimeCheckOut;
 window.handleStaffLeaveSubmit = handleStaffLeaveSubmit;
 window.exportStaffAttendanceExcel = exportStaffAttendanceExcel;
+window.handleDeleteStaffAttendance = handleDeleteStaffAttendance;
+window.handleResetStaffAttendance = handleResetStaffAttendance;
+
 
 
 

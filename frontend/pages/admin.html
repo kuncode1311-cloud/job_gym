@@ -229,6 +229,9 @@
               <button class="btn btn-secondary" onclick="exportStaffAttendanceExcel()" style="padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;">
                 <i class="fa fa-file-excel text-green"></i> Xuất Excel
               </button>
+              <button class="btn btn-secondary" onclick="handleResetStaffAttendance()" style="padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;" title="Xóa các ca spam/bấm thử và khôi phục 7 ca mẫu chuẩn">
+                <i class="fa fa-sync-alt text-blue"></i> Dọn dẹp &amp; Đặt lại
+              </button>
             </div>
           </div>
 
@@ -334,14 +337,15 @@
               <table class="custom-table">
                 <thead>
                   <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.12);">
-                    <th style="color: #9CA3AF; font-weight: 600; width: 110px;">Mã Chấm Công</th>
-                    <th style="color: #9CA3AF; font-weight: 600; width: 130px;">Ngày Làm Việc</th>
-                    <th style="color: #9CA3AF; font-weight: 600; width: 220px;">Ca Phân Công</th>
-                    <th style="color: #9CA3AF; font-weight: 600; width: 130px;">Giờ Vào (Check-in)</th>
-                    <th style="color: #9CA3AF; font-weight: 600; width: 130px;">Giờ Ra (Check-out)</th>
-                    <th style="color: #9CA3AF; font-weight: 600; width: 120px; text-align: center;">Số Giờ Làm</th>
-                    <th style="color: #9CA3AF; font-weight: 600; width: 130px;">Trạng Thái</th>
+                    <th style="color: #9CA3AF; font-weight: 600; width: 100px;">Mã Công</th>
+                    <th style="color: #9CA3AF; font-weight: 600; width: 120px;">Ngày Làm Việc</th>
+                    <th style="color: #9CA3AF; font-weight: 600; width: 200px;">Ca Phân Công</th>
+                    <th style="color: #9CA3AF; font-weight: 600; width: 120px;">Giờ Vào</th>
+                    <th style="color: #9CA3AF; font-weight: 600; width: 120px;">Giờ Ra</th>
+                    <th style="color: #9CA3AF; font-weight: 600; width: 110px; text-align: center;">Số Giờ Làm</th>
+                    <th style="color: #9CA3AF; font-weight: 600; width: 120px;">Trạng Thái</th>
                     <th style="color: #9CA3AF; font-weight: 600;">Ghi Chú</th>
+                    <th style="color: #9CA3AF; font-weight: 600; width: 80px; text-align: center;">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="staffAttTableBody">
@@ -351,6 +355,7 @@
             </div>
           </div>
         </section>
+
 
         <!-- ================= TAB: MY ATTENDANCE (LỊCH SỬ ĐIỂM DANH CHẤM CÔNG - CHUẨN FIGMA) ================= -->
         <section id="section_my_attendance" class="tab-section" style="display: none;">
