@@ -635,11 +635,13 @@ const GymAPI = {
     const timeStr = now.toTimeString().split(' ')[0];
     record.CheckOutTime = timeStr;
 
-    // Tính khoảng cách giờ thực tế
+    // Tính khoảng cách giờ làm
     const inParts = record.CheckInTime.split(':').map(Number);
     const outParts = timeStr.split(':').map(Number);
     const diffHours = (outParts[0] + outParts[1] / 60) - (inParts[0] + inParts[1] / 60);
-    record.WorkHours = diffHours > 0.05 ? Number(diffHours.toFixed(2)) : 8.00;
+    record.WorkHours = diffHours > 0.05 ? Number(diffHours.toFixed(1)) : 8.0;
+    record.Status = 'OnTime';
+    record.Note = 'Đúng giờ';
 
     MockDB.saveDB(db);
     return { success: true, data: record };

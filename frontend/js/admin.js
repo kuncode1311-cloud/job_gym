@@ -1694,20 +1694,27 @@ async function handleStaffRealtimeCheckIn() {
   const timeStr = now.toTimeString().split(' ')[0];
   const dateStr = now.toISOString().split('T')[0];
 
-  const isLate = now.getHours() > 6 || (now.getHours() === 6 && now.getMinutes() > 15);
+  // Tự động nhận diện ca trực theo khung giờ hiện tại
+  let shiftName = 'Ca Sáng (06:00 - 14:00)';
+  const hour = now.getHours();
+  if (hour >= 13 && hour < 18) {
+    shiftName = 'Ca Chiều (14:00 - 22:00)';
+  } else if (hour >= 18) {
+    shiftName = 'Ca Tối (18:00 - 23:00)';
+  }
 
   await GymAPI.checkInStaff({
     UserID: currentUser.UserID || 8,
     StaffName: currentUser.Fullname || 'Lâm Văn Cường',
     StaffCode: 'NV201',
     ShiftDate: dateStr,
-    ShiftName: 'Ca Sáng (06:00 - 14:00)',
+    ShiftName: shiftName,
     CheckInTime: timeStr,
-    Status: isLate ? 'Late' : 'OnTime',
-    Note: isLate ? 'Đi muộn ca sáng' : 'Đúng giờ'
+    Status: 'OnTime',
+    Note: 'Check-in đúng giờ'
   });
 
-  showToast(`✓ Check-in vào ca thành công lúc ${timeStr}!`, 'success');
+  showToast(`Check-in vào ca thành công lúc ${timeStr}!`, 'success');
   await loadStaffAttendanceData();
 }
 
@@ -1723,7 +1730,7 @@ async function handleStaffRealtimeCheckOut() {
 
   const result = await GymAPI.checkOutStaff(activeRecord.AttendanceStaffID);
   if (result.success) {
-    showToast(`✓ Check-out tan ca thành công! Tổng số giờ làm: ${result.data.WorkHours} giờ.`, 'success');
+    showToast(`Check-out tan ca thành công! Đã ghi nhận ${result.data.WorkHours}h làm việc.`, 'success');
     await loadStaffAttendanceData();
   } else {
     showToast(result.message || 'Lỗi khi check-out!', 'error');
