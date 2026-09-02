@@ -1607,6 +1607,22 @@ async function loadStaffAttendanceData() {
           statusBadge = '<span class="badge badge-red" style="padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 12px;"><i class="fa fa-exclamation-triangle"></i> Về sớm</span>';
         }
 
+        let workHoursDisplay = '—';
+        if (!r.CheckOutTime) {
+          workHoursDisplay = '<span style="color: #10B981; font-weight: 700;">Đang làm...</span>';
+        } else if (r.WorkHours !== undefined && r.WorkHours !== null) {
+          const numH = Number(r.WorkHours);
+          if (numH < 0.02) {
+            const secs = Math.max(1, Math.round(numH * 3600));
+            workHoursDisplay = `${secs}s`;
+          } else if (numH < 1) {
+            const mins = Math.max(1, Math.round(numH * 60));
+            workHoursDisplay = `${mins} phút`;
+          } else {
+            workHoursDisplay = `${numH}h`;
+          }
+        }
+
         return `
           <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
             <td style="font-weight: 700; color: #FFFFFF; padding: 14px 18px;">#${r.AttendanceStaffID}</td>
@@ -1614,7 +1630,7 @@ async function loadStaffAttendanceData() {
             <td style="color: #3B82F6; font-weight: 700; padding: 14px 18px;">${r.ShiftName || 'Ca Sáng (06:00 - 14:00)'}</td>
             <td style="color: #10B981; font-weight: 700; padding: 14px 18px;">${r.CheckInTime}</td>
             <td style="color: ${r.CheckOutTime ? '#E5E7EB' : '#9CA3AF'}; padding: 14px 18px;">${r.CheckOutTime || '—'}</td>
-            <td style="font-weight: 700; color: #FFFFFF; text-align: center; padding: 14px 18px;">${r.WorkHours ? r.WorkHours + 'h' : '8.0h'}</td>
+            <td style="font-weight: 700; color: #FFFFFF; text-align: center; padding: 14px 18px;">${workHoursDisplay}</td>
             <td style="padding: 14px 18px;">${statusBadge}</td>
             <td style="color: #9CA3AF; padding: 14px 18px;">${r.Note || '—'}</td>
             <td style="text-align: center; padding: 14px 18px;">

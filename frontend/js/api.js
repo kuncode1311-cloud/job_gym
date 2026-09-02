@@ -632,16 +632,17 @@ const GymAPI = {
     if (!record) return { success: false, message: 'Không tìm thấy ca làm việc đang mở' };
 
     const now = new Date();
-    const timeStr = now.toTimeString().split(' ')[0];
-    record.CheckOutTime = timeStr;
-
-    // Tính khoảng cách giờ làm
+    // Tính khoảng cách thời gian thực tế chính xác (tính theo giây & giờ)
     const inParts = record.CheckInTime.split(':').map(Number);
     const outParts = timeStr.split(':').map(Number);
-    const diffHours = (outParts[0] + outParts[1] / 60) - (inParts[0] + inParts[1] / 60);
-    record.WorkHours = diffHours > 0.05 ? Number(diffHours.toFixed(1)) : 8.0;
+    const inSec = inParts[0] * 3600 + inParts[1] * 60 + (inParts[2] || 0);
+    const outSec = outParts[0] * 3600 + outParts[1] * 60 + (outParts[2] || 0);
+    const diffSec = Math.max(1, outSec - inSec);
+    const diffHours = Number((diffSec / 3600).toFixed(2));
+    
+    record.WorkHours = diffHours;
     record.Status = 'OnTime';
-    record.Note = 'Đúng giờ';
+    record.Note = diffSec < 60 ? `Làm ${diffSec}s` : (diffSec < 3600 ? `Làm ${Math.round(diffSec / 60)} phút` : 'Đúng giờ');
 
     MockDB.saveDB(db);
     return { success: true, data: record };
