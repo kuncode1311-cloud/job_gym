@@ -1656,37 +1656,31 @@ async function loadStaffAttendanceData() {
   const btnOut = document.getElementById('btnStaffCheckOut');
 
   if (activeUncompletedShift) {
-    // Đang trong ca làm việc -> Cho phép Check-out
     if (inTimeEl) inTimeEl.textContent = activeUncompletedShift.CheckInTime;
     if (outTimeEl) outTimeEl.textContent = 'Chưa check-out';
     if (statusBadgeEl) {
       statusBadgeEl.className = 'badge badge-green';
       statusBadgeEl.innerHTML = `<i class="fa fa-check-circle"></i> Đang trong ca (Vào lúc ${activeUncompletedShift.CheckInTime})`;
     }
-    if (btnIn) { btnIn.disabled = true; btnIn.style.opacity = '0.5'; btnIn.style.cursor = 'not-allowed'; }
-    if (btnOut) { btnOut.disabled = false; btnOut.style.opacity = '1'; btnOut.style.cursor = 'pointer'; }
   } else if (todayRecord && todayRecord.CheckOutTime) {
-    // Đã hoàn thành ca hôm nay -> Vẫn cho phép bấm Check-in ca mới nếu muốn
     if (inTimeEl) inTimeEl.textContent = todayRecord.CheckInTime;
     if (outTimeEl) outTimeEl.textContent = todayRecord.CheckOutTime;
     if (statusBadgeEl) {
       statusBadgeEl.className = 'badge badge-green';
-      statusBadgeEl.innerHTML = `<i class="fa fa-check-double"></i> Đã hoàn thành ca (${todayRecord.WorkHours}h)`;
+      statusBadgeEl.innerHTML = `<i class="fa fa-check-double"></i> Đã hoàn thành ca`;
     }
-    if (btnIn) { btnIn.disabled = false; btnIn.style.opacity = '1'; btnIn.style.cursor = 'pointer'; }
-    if (btnOut) { btnOut.disabled = true; btnOut.style.opacity = '0.5'; btnOut.style.cursor = 'not-allowed'; }
   } else {
-    // Chưa vào ca -> Nút Check-in sáng để bấm
     if (inTimeEl) inTimeEl.textContent = 'Chưa check-in';
     if (outTimeEl) outTimeEl.textContent = '—';
     if (statusBadgeEl) {
       statusBadgeEl.className = 'badge badge-yellow';
       statusBadgeEl.innerHTML = '<i class="fa fa-hourglass-start"></i> Chưa vào ca';
     }
-    if (btnIn) { btnIn.disabled = false; btnIn.style.opacity = '1'; btnIn.style.cursor = 'pointer'; }
-    if (btnOut) { btnOut.disabled = true; btnOut.style.opacity = '0.5'; btnOut.style.cursor = 'not-allowed'; }
   }
 
+  // Luôn giữ 2 nút Check-in và Check-out sáng để bấm test thoải mái
+  if (btnIn) { btnIn.disabled = false; btnIn.style.opacity = '1'; btnIn.style.cursor = 'pointer'; }
+  if (btnOut) { btnOut.disabled = false; btnOut.style.opacity = '1'; btnOut.style.cursor = 'pointer'; }
 
   // Calculate & Update KPIs
   const workDays = records.length;
@@ -1710,7 +1704,6 @@ async function handleStaffRealtimeCheckIn() {
   const timeStr = now.toTimeString().split(' ')[0];
   const dateStr = now.toISOString().split('T')[0];
 
-  // Tự động nhận diện ca trực theo khung giờ hiện tại
   let shiftName = 'Ca Sáng (06:00 - 14:00)';
   const hour = now.getHours();
   if (hour >= 13 && hour < 18) {
@@ -1727,7 +1720,7 @@ async function handleStaffRealtimeCheckIn() {
     ShiftName: shiftName,
     CheckInTime: timeStr,
     Status: 'OnTime',
-    Note: 'Check-in đúng giờ'
+    Note: 'Đúng giờ'
   });
 
   showToast(`Check-in vào ca thành công lúc ${timeStr}!`, 'success');
@@ -1737,16 +1730,34 @@ async function handleStaffRealtimeCheckIn() {
 async function handleStaffRealtimeCheckOut() {
   const currentUser = (typeof GymAPI !== 'undefined' && GymAPI.getCurrentUser) ? GymAPI.getCurrentUser() : { UserID: 8, Fullname: 'Lâm Văn Cường' };
   const records = await GymAPI.getStaffAttendance(currentUser.UserID);
-  const activeRecord = records.find(r => !r.CheckOutTime);
-
-  if (!activeRecord) {
-    showToast('Bạn chưa có ca làm việc nào đang mở để check-out!', 'error');
-    return;
+  
+  // Tìm ca đang mở (chưa có giờ ra) hoặc ca gần nhất để check-out
+  let targetRecord = records.find(r => !r.CheckOutTime);
+  if (!targetRecord && records.length > 0) {
+    targetRecord = records[0];
   }
 
-  const result = await GymAPI.checkOutStaff(activeRecord.AttendanceStaffID);
+  if (!targetRecord) {
+    // Nếu chưa có ca nào thì tạo nhanh 1 ca và check-out luôn
+    const now = new Date();
+    const timeStr = now.toTimeString().split(' ')[0];
+    const newRec = await GymAPI.checkInStaff({
+      UserID: currentUser.UserID || 8,
+      StaffName: currentUser.Fullname || 'Lâm Văn Cường',
+      StaffCode: 'NV201',
+      ShiftDate: now.toISOString().split('T')[0],
+      ShiftName: 'Ca Sáng (06:00 - 14:00)',
+      CheckInTime: timeStr,
+      Status: 'OnTime',
+      Note: 'Đúng giờ'
+    });
+    targetRecord = newRec.data;
+  }
+
+  const result = await GymAPI.checkOutStaff(targetRecord.AttendanceStaffID);
   if (result.success) {
-    showToast(`Check-out tan ca thành công! Đã ghi nhận ${result.data.WorkHours}h làm việc.`, 'success');
+    const durationText = result.data.Note ? result.data.Note : `${result.data.WorkHours}h`;
+    showToast(`Check-out tan ca thành công! (${durationText})`, 'success');
     await loadStaffAttendanceData();
   } else {
     showToast(result.message || 'Lỗi khi check-out!', 'error');
